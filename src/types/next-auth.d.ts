@@ -9,15 +9,22 @@ declare module "next-auth" {
         image?: string | null;
         password?: string;
     }
+
     interface Session {
         user: {
-            email: string; // Use email instead of id
+            email: string;
+            name?: string | null;
+            image?: string | null;
         } & DefaultSession["user"];
+        status: "authenticated" | "unauthenticated";
     }
 }
 
 declare module "next-auth/jwt" {
     interface JWT {
-        email: string; // Use email instead of id
+        email: string;
+        name?: string | null;
+        image?: string | null;
+        status?: "authenticated" | "unauthenticated";
     }
 }

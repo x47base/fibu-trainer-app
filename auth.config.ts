@@ -61,13 +61,23 @@ export default {
     callbacks: {
         async jwt({ token, user }) {
             if (user) {
-                token.email = user.email; // Pass email instead of customId
+                token.email = user.email;
+                token.name = user.name;
+                token.image = user.image;
             }
             return token;
         },
         async session({ session, token }) {
-            if (session.user && token.email) {
-                session.user.email = token.email; // Use email in session
+            if (token.email) {
+                session.user = {
+                    email: token.email,
+                    name: token.name ?? "User",
+                    image: token.image ?? null,
+                };
+                session.status = "authenticated";
+            } else {
+                session.user = undefined;
+                session.status = "unauthenticated";
             }
             return session;
         },
