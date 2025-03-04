@@ -14,14 +14,12 @@ export default function SignIn() {
     const router = useRouter();
     const { data: session, status } = useSession();
 
-    // Redirect if already signed in
     useEffect(() => {
         if (status === "authenticated") {
             router.push("/train");
         }
     }, [status, router]);
 
-    // Fetch CSRF token on mount
     useEffect(() => {
         const fetchCsrfToken = async () => {
             try {
@@ -46,19 +44,19 @@ export default function SignIn() {
         }
 
         const result = await signIn("credentials", {
-            redirect: false, // Handle redirect manually
+            redirect: false,
             callbackUrl: "/train",
             email,
             password,
             ...(isRegister && { name }),
-            csrfToken, // Include CSRF token
+            csrfToken,
         });
 
         if (result?.error) {
             setErrorMessage(result.error);
         } else {
             console.log(isRegister ? "Successfully registered" : "Successfully signed in");
-            router.push("/train"); // Manually redirect on success
+            router.push("/train");
         }
     };
 
@@ -123,7 +121,7 @@ export default function SignIn() {
                         type="submit"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        disabled={!csrfToken} // Disable button if CSRF token isn’t loaded
+                        disabled={!csrfToken}
                         className="w-full py-3 px-4 bg-themecolor text-white font-semibold rounded-lg shadow-md hover:bg-themecolorhover focus:outline-none focus:ring-2 focus:ring-themecolorhover transition-all duration-200 disabled:bg-gray-400"
                     >
                         {isRegister ? "Register" : "Sign In"}
