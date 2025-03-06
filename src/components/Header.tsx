@@ -43,14 +43,12 @@ export default function Header() {
                                 >
                                     {link.name}
                                 </motion.span>
-                                {/* Gamified Hintergrund-Animation */}
                                 <motion.span
-                                    className="absolute inset-0 bg-themecolor/20 rounded-md z-0" // Hellerer Farbton für Kontrast
+                                    className="absolute inset-0 bg-themecolor/20 rounded-md z-0"
                                     initial={{ scale: 0, opacity: 0 }}
                                     whileHover={{ scale: 1.2, opacity: 1 }}
                                     transition={{ duration: 0.3, ease: "easeOut" }}
                                 />
-                                {/* Aktiver Zustand: Unterstrich */}
                                 {isActive && (
                                     <motion.span
                                         className="absolute bottom-[-8px] left-0 w-full h-1 bg-themecolor rounded-full"
