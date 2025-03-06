@@ -19,12 +19,7 @@ export default function Header() {
         <header className="flex items-center h-16 px-8 z-40">
             <div className="flex-1">
                 <Link href="/">
-                    {/* Desktop Title */}
-                    <h1 className="hidden md:block font-bold text-themecolor text-2xl">
-                        FiBu-Trainer
-                    </h1>
-                    {/* Mobile Title */}
-                    <h1 className="block md:hidden font-bold text-themecolor text-2xl">
+                    <h1 className="font-bold text-themecolor text-2xl">
                         FiBu-Trainer
                     </h1>
                 </Link>
