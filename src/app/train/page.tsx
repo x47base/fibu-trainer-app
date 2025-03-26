@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import Buchung, { Validate } from "@/components/aufgaben/Buchung";
+import Texts , { Validate } from "@/components/aufgaben/Texts";
 
 export default function TrainPage() {
     const { data: session, status } = useSession();
@@ -22,7 +22,7 @@ export default function TrainPage() {
     return (
         <div className="min-h-screen w-full flex flex-col items-center py-12 px-4 mt-12">
             {/* Base page with nothing */}
-            <Buchung taskId={1} />
+            <Texts taskId={1} />
         </div>
     );
 }
