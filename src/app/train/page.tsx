@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { IoArrowForwardSharp } from "react-icons/io5";
 import Buchung from "@/components/aufgaben/Buchung"; // Stelle sicher, dass der Pfad stimmt
 import MultipleChoice from "@/components/aufgaben/MultipleChoice";
-import DragDrop from "@/components/aufgaben/MultipleChoice";
-import Texts from "@/components/aufgaben/MultipleChoice";
+import DragDrop from "@/components/aufgaben/MultipleChoice"; //import drag n drop
+import Texts from "@/components/aufgaben/MultipleChoice"; //import lueckentext
 
 export default function TrainPage() {
     const { data: session, status } = useSession();

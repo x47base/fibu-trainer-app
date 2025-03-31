@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-// Beispiel-Daten für Multiple Choice
+// Beispiel-Daten für Multiple Choice.
 const placeholderData = {
     "_id": 1,
     "type": "booking",
