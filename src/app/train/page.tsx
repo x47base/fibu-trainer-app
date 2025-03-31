@@ -10,8 +10,6 @@ import DragDrop from "@/components/aufgaben/MultipleChoice"; //import drag n dro
 import Texts from "@/components/aufgaben/MultipleChoice"; //import lueckentext
 
 
-import Texts , { Validate } from "@/components/aufgaben/Texts";
-
 
 export default function TrainPage() {
     const { data: session, status } = useSession();
@@ -104,6 +102,8 @@ export default function TrainPage() {
                 {/* Buchung-Component anzeigen, wenn showBuchung true ist */}
                 {showBuchung && <Buchung taskId={1} />}
                 {showMultipleChoice &&<MultipleChoice taskId={1} />}
+                {showTexts &&<Texts taskId={1} />}
+                {showDragDrop &&<DragDrop taskId={1} />}
             </main>
 
         </div>
