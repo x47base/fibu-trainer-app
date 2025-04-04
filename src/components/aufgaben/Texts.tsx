@@ -1,34 +1,48 @@
 import { useState, useEffect } from "react";
 
-// Beispiel-Daten
-const placeholderData = {
-    "type": "text",
-    "content": {
-        "scenario": "Eine Firma kauft Waren auf Rechnung für 400.-",
-        "text": "Das {0} erhöht sich um Chf 400.",
-        "answers": [
-            "Konto"
-        ]
-    },
-    "tags": [],
-    "createdAt": "2025-03-11T12:27:47.186Z"
-};
-
-export default function Create(taskId) {
-    const [data, setData] = useState(placeholderData);
+export default function Texts({ taskId }) {
+    const [data, setData] = useState(null);
+    const [isCorrect, setIsCorrect] = useState(null);
 
     useEffect(() => {
-        // fetch(`/api/tasks/${taskId}`).then(response => response.json()).then(data => setData(data));
+        const fetchTaskData = async () => {
+            try {
+                const response = await fetch(`/api/tasks/${taskId}`);
+
+                if (response.ok) {
+                    const taskData = await response.json();
+                    console.log("Erwarteter Typ: text, Gelieferter Typ:", taskData.type);
+
+
+                    if (taskData.type === "text") {
+                        setData(taskData);
+                    } else {
+                        console.warn("Diese Aufgabe ist kein Lückentext.");
+                    }
+                } else {
+                    console.error("Fehler beim Laden der Aufgabe:", response.status);
+                }
+            } catch (error) {
+                console.error("Fehler beim Abrufen der Daten:", error);
+            }
+        };
+
+        if (taskId) {
+            fetchTaskData();
+        }
     }, [taskId]);
+
+    if (!data) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div id={`task-${taskId}`} className="p-4 rounded-md flex flex-col justify-center items-center">
-            <h2 className="text-3xl semi-bold mb-6">Aufgabenstellung</h2>
-            <span className="mb-10 w-3/6">{data.content.scenario}</span>
+            <h2 className="text-3xl semi-bold mb-6">Lückentext-Aufgabe</h2>
+            <span className="mb-10 w-3/6">{data.content?.text || "Keine Szenario-Beschreibung verfügbar."}</span>
 
             <div className="flex flex-col items-center gap-4">
                 <label htmlFor="Lueckentext" className="block text-sm font-medium text-gray-700 mb-1">
-                    {data.content.text.replace("{0}", "______")}
                 </label>
                 <input
                     type="text"
@@ -40,31 +54,39 @@ export default function Create(taskId) {
             </div>
 
             <button
-                onClick={() => Validate(data.content.answers)}
-                className="mt-4 py-2 px-4 bg-themecolor text-white font-semibold rounded-lg shadow-md hover:bg-themecolorhover focus:outline-none focus:ring-2 focus:ring-themecolorhover transition-all duration-200 disabled:bg-gray-400"
+                onClick={() => Validate(setIsCorrect, data.content?.answers)}
+                className="mt-4 py-2 px-4 bg-themecolor text-white font-semibold rounded-lg shadow-md hover:bg-themecolorhover"
             >
                 Prüfen
             </button>
+
+            {isCorrect !== null && (
+                <div className={`mt-4 px-4 py-2 rounded-lg text-white ${isCorrect ? "bg-green-500" : "bg-red-500"}`}>
+                    {isCorrect ? "Richtige Antwort!" : "Falsche Antwort. Bitte überprüfen."}
+                </div>
+            )}
         </div>
     );
 }
 
-export async function Validate(correctAnswers) {
-    let isValid = false;
+export async function Validate(setIsCorrect, correctAnswers) {
+    if (!correctAnswers || correctAnswers.length === 0) {
+        console.error("Es gibt keine richtigen Antworten zum Vergleich.");
+        setIsCorrect(false);
+        return;
+    }
 
     // Lückentext-Eingabe holen
     const input = document.querySelector("input[id='Lueckentext']");
-    if (!input) return isValid;
+    if (!input) {
+        console.error("Eingabefeld nicht gefunden.");
+        return;
+    }
 
     const enteredValue = input.value.trim().toLowerCase();
     console.log("Eingabe:", enteredValue);
     console.log("Erwartete Antworten:", correctAnswers);
 
     // Überprüfung der Eingabe mit den möglichen Antworten
-    if (correctAnswers.map(ans => ans.toLowerCase()).includes(enteredValue)) {
-        isValid = true;
-    }
-
-    alert(isValid ? "Richtige Antwort!" : "Falsche Antwort. Bitte überprüfen.");
-    return isValid;
+    setIsCorrect(correctAnswers.some(ans => ans.toLowerCase() === enteredValue));
 }

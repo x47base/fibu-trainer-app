@@ -7,7 +7,7 @@ import { IoArrowForwardSharp } from "react-icons/io5";
 import Buchung from "@/components/aufgaben/Buchung"; // Stelle sicher, dass der Pfad stimmt
 import MultipleChoice from "@/components/aufgaben/MultipleChoice";
 import DragDrop from "@/components/aufgaben/MultipleChoice"; //import drag n drop
-import Texts from "@/components/aufgaben/MultipleChoice"; //import lueckentext
+import Texts from "@/components/aufgaben/Texts"; //import lueckentext
 
 
 
@@ -101,8 +101,8 @@ export default function TrainPage() {
 
                 {/* Buchung-Component anzeigen, wenn showBuchung true ist */}
                 {showBuchung && <Buchung taskId={1} />}
-                {showMultipleChoice &&<MultipleChoice taskId={1} />}
-                {showTexts &&<Texts taskId={1} />}
+                {showMultipleChoice &&<MultipleChoice taskId={4} />}
+                {showTexts &&<Texts taskId={2} />}
                 {showDragDrop &&<DragDrop taskId={1} />}
             </main>
 

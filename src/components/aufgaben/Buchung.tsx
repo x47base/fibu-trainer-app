@@ -1,31 +1,32 @@
 import { useState, useEffect } from "react";
 
-// Beispiel-Daten
-const placeholderData = {
-    "_id": 1,
-    "type": "booking",
-    "content": {
-        "bookings": [
-            {
-                "soll": "Verbindlichkeiten aus Lieferungen und Leistungen",
-                "haben": "Bank",
-                "betrag": 400
-            }
-        ],
-        "scenario": "Die Firma zahlt eine Rechnung für CHF 400"
-    },
-    "tags": [
-        "Rechnung"
-    ],
-    "createdAt": "2025-03-06T12:28:12.722Z"
-};
-
-export default function Create(taskId) {
-    const [data, setData] = useState(placeholderData);
+export default function Create({ taskId }) {
+    const [data, setData] = useState(null);
+    const [isCorrect, setIsCorrect] = useState(null);
 
     useEffect(() => {
-        // fetch(`/api/tasks/${taskId}`).then(response => response.json()).then(data => setData(data));
+        const fetchTaskData = async () => {
+            try {
+                const response = await fetch(`/api/tasks/${taskId}`);
+                if (response.ok) {
+                    const taskData = await response.json();
+                    setData(taskData);
+                } else {
+                    console.error("Fehler beim Laden der Aufgabe:", response.status);
+                }
+            } catch (error) {
+                console.error("Fehler beim Abrufen der Daten:", error);
+            }
+        };
+
+        if (taskId) {
+            fetchTaskData();
+        }
     }, [taskId]);
+
+    if (!data) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div id={`task-${taskId}`} className="p-4 rounded-md flex flex-col justify-center items-center ">
@@ -71,44 +72,44 @@ export default function Create(taskId) {
                         placeholder="Betrag"
 
                     />
-                    
+
                 </div>
 
             ))}
+
             <button
-                 onClick={Validate}
-                 className="mt-4 py-2 px-4 bg-themecolor text-white font-semibold rounded-lg shadow-md hover:bg-themecolorhover focus:outline-none focus:ring-2 focus:ring-themecolorhover transition-all duration-200 disabled:bg-gray-400"
+                onClick={() => Validate(setIsCorrect, data)}
+                className="mt-4 py-2 px-4 bg-themecolor text-white font-semibold rounded-lg shadow-md hover:bg-themecolorhover"
             >
                 Prüfen
             </button>
+
+            {isCorrect !== null && (
+                <div className={`mt-4 px-4 py-2 rounded-lg text-white ${isCorrect ? "bg-green-500" : "bg-red-500"}`}>
+                    {isCorrect ? "Richtige Buchung!" : "Falsche Buchung. Bitte überprüfen."}
+                </div>
+            )}
 
         </div>
     );
 }
 
-export async function Validate() {
+export async function Validate(setIsCorrect, data) {
     let isValid = true;
-    
-    // Alle Buchungseingaben holen
+
     const sollInputs = Array.from(document.querySelectorAll("input[id='Soll']")).map(input => input.value.trim());
     const habenInputs = Array.from(document.querySelectorAll("input[id='Haben']")).map(input => input.value.trim());
     const betragInputs = Array.from(document.querySelectorAll("input[id='Betrag']")).map(input => parseFloat(input.value));
-    console.log("Soll Inputs:", sollInputs);
-    console.log("Haben Inputs:", habenInputs);
-    console.log("Betrag Inputs:", betragInputs);
-    
-    placeholderData.content.bookings.forEach((booking, index) => {
+
+    data.content.bookings.forEach((booking, index) => {
         if (
-            sollInputs[index] !== booking.soll || 
-            habenInputs[index] !== booking.haben || 
+            sollInputs[index] !== booking.soll ||
+            habenInputs[index] !== booking.haben ||
             betragInputs[index] !== booking.betrag
         ) {
             isValid = false; // Falls irgendein Wert nicht übereinstimmt
         }
     });
 
-    alert(isValid ? "Richtige Buchung!" : "Falsche Buchung. Bitte überprüfen.");
-    return isValid;
-
-
+    setIsCorrect(isValid);
 }
