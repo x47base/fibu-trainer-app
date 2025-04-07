@@ -8,9 +8,19 @@ async function getTasks() {
     return tasks;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
-        const tasks = await getTasks();
+        const { searchParams } = new URL(request.url);
+        const taskType = searchParams.get("type");
+
+        let tasks;
+        if (taskType) {
+            const client = await clientPromise;
+            const db = client.db();
+            tasks = await db.collection("tasks").find({ type: taskType }).toArray();
+        } else {
+            tasks = await getTasks();
+        }
         return NextResponse.json(tasks);
     } catch (error) {
         console.error("Error in GET /api/tasks:", error);
