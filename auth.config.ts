@@ -45,6 +45,7 @@ export default {
                         emailVerified: null,
                         image: null,
                         password: pwHash,
+                        admin: false
                     });
                 }
 
@@ -64,6 +65,7 @@ export default {
                 token.email = user.email;
                 token.name = user.name;
                 token.image = user.image;
+                token.admin = user.admin ?? false;
             }
             return token;
         },
@@ -73,6 +75,7 @@ export default {
                     email: token.email,
                     name: token.name ?? "User",
                     image: token.image ?? null,
+                    admin: token.admin ?? false,
                 };
                 session.status = "authenticated";
             } else {
