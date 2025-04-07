@@ -22,7 +22,7 @@ export default function TrainPage() {
 
     useEffect(() => {
         if (status === "loading") return;
-        // @ts-ignore
+        // @ts-expect-error: next-auth session type is not recognized
         if (!session || status === "unauthenticated") {
             router.push("/signin");
         }
