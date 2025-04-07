@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import clientPromise from "@/lib/db";
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
-    const taskId = parseInt(params.id, 10);
+    const { id } = await params;
+    const taskId = parseInt(id, 10);
     if (isNaN(taskId)) {
         return NextResponse.json({ message: "Invalid task ID" }, { status: 400 });
     }
@@ -23,7 +24,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
-    const taskId = parseInt(params.id, 10);
+    const { id } = await params;
+    const taskId = parseInt(id, 10);
     if (isNaN(taskId)) {
         return NextResponse.json({ message: "Invalid task ID" }, { status: 400 });
     }
@@ -55,7 +57,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-    const taskId = parseInt(params.id, 10);
+    const { id } = await params;
+    const taskId = parseInt(id, 10);
     if (isNaN(taskId)) {
         return NextResponse.json({ message: "Invalid task ID" }, { status: 400 });
     }
