@@ -28,15 +28,17 @@ export default function Header() {
             <div className="hidden md:flex flex-1 justify-center">
                 <nav className="flex gap-10">
                     {links.map((link, index) => {
+                        if (link.adminRequired && !session?.user?.admin) return null;
                         const isActive = pathname === link.path;
 
                         return (
                             <Link key={index} href={link.path} className="relative group">
                                 <motion.span
-                                    className={`font-medium text-gray-700 ${isActive
+                                    className={`font-medium text-gray-700 ${
+                                        isActive
                                             ? "text-themecolor font-semibold"
                                             : "hover:text-themecolorhover"
-                                        } relative z-10`}
+                                    } relative z-10`}
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.95 }}
                                     transition={{ type: "spring", stiffness: 400, damping: 10 }}

@@ -1,21 +1,30 @@
 interface Link {
     name: string;
     path: string;
+    adminrequired: boolean;
 }
 
 const links: Link[] = [
     {
         name: "Home",
-        path: "/"
+        path: "/",
+        adminrequired: false,
     },
     {
         name: "Train",
-        path: "/train"
+        path: "/train",
+        adminrequired: false,
     },
     {
         name: "History",
-        path: "/history"
+        path: "/history",
+        adminrequired: false,
     },
+    {
+        name: "Dashboard",
+        path: "/dashboard",
+        adminrequired: true,
+    }
 ];
 
 export default links;
