@@ -17,7 +17,7 @@ const placeholderData = {
     "createdAt": "2025-03-06T12:28:12.722Z"
 };
 
-// @ts-ignore
+// @ts-expect-error: types
 export default function MultipleChoice({ taskId }) {
     const [data, setData] = useState(placeholderData);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -30,16 +30,14 @@ export default function MultipleChoice({ taskId }) {
 
     function validateAnswer() {
         if (selectedAnswer === data.content.correctAnswer) {
-            // @ts-ignore
+            // @ts-expect-error: types
             setIsCorrect(true);
         } else {
-            // @ts-ignore
+            // @ts-expect-error: types
             setIsCorrect(false);
         }
     }
 
-    // @ts-ignore
-    // @ts-ignore
     return (
         <div id={`task-${taskId}`} className="p-4 rounded-md flex flex-col justify-center items-center">
             <h2 className="text-3xl font-semibold mb-6">Multiple-Choice Aufgabe</h2>
@@ -53,6 +51,7 @@ export default function MultipleChoice({ taskId }) {
                             name="buchung"
                             value={option}
                             checked={selectedAnswer === option}
+                            // @ts-expect-error: types
                             onChange={() => setSelectedAnswer(option)}
                             className="cursor-pointer"
                         />
