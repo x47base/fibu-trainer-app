@@ -8,9 +8,11 @@ import { CgMenuGridO } from "react-icons/cg";
 import { FiX } from "react-icons/fi";
 import MobileNavFull from "./MobileNavFull";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function Header() {
     const pathname = usePathname();
+    const { data: session } = useSession();
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
     const toggleMobileNav = () => setMobileNavOpen((prev) => !prev);
@@ -28,7 +30,7 @@ export default function Header() {
             <div className="hidden md:flex flex-1 justify-center">
                 <nav className="flex gap-10">
                     {links.map((link, index) => {
-                        if (link.adminRequired && !session?.user?.admin) return null;
+                        if (link.adminrequired && !session?.user?.admin) return null;
                         const isActive = pathname === link.path;
 
                         return (
