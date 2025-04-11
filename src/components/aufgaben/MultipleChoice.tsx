@@ -1,52 +1,53 @@
 import { useState, useEffect } from "react";
 
-// Beispiel-Daten für Multiple Choice.
-const placeholderData = {
-    "_id": 1,
-    "type": "booking",
-    "content": {
-        "scenario": "Die Firma zahlt eine Rechnung für CHF 400",
-        "correctAnswer": "Verbindlichkeiten aus Lieferungen und Leistungen → Bank",
-        "options": [
-            "Verbindlichkeiten aus Lieferungen und Leistungen → Bank", // Richtig
-            "Kasse → Bank",
-            "Bank → Umsatzerlöse"
-        ]
-    },
-    "tags": ["Rechnung"],
-    "createdAt": "2025-03-06T12:28:12.722Z"
-};
-
-// @ts-ignore
 export default function MultipleChoice({ taskId }) {
-    const [data, setData] = useState(placeholderData);
+    const [data, setData] = useState(null);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
-    const [isCorrect, setIsCorrect] = useState(null); // null = noch nicht geprüft
+    const [isCorrect, setIsCorrect] = useState(null);
 
     useEffect(() => {
-        // Hier könnte ein API-Call erfolgen, wenn echte Daten verwendet werden
-        // fetch(`/api/tasks/${taskId}`).then(response => response.json()).then(data => setData(data));
+        const fetchTaskData = async () => {
+            try {
+                const response = await fetch(`/api/tasks/${taskId}`);
+                if (response.ok) {
+                    const taskData = await response.json();
+                    console.log("Erwarteter Typ: multiple-choice, Gelieferter Typ:", taskData.type);
+
+                    if (taskData.type === "multiple-choice") {
+                        setData(taskData);
+                    } else {
+                        console.warn("Diese Aufgabe ist kein Multiple-Choice.");
+                    }
+                } else {
+                    console.error("Fehler beim Laden der Aufgabe:", response.status);
+                }
+            } catch (error) {
+                console.error("Fehler beim Abrufen der Daten:", error);
+            }
+        };
+
+        if (taskId) {
+            fetchTaskData();
+        }
     }, [taskId]);
 
-    function validateAnswer() {
-        if (selectedAnswer === data.content.correctAnswer) {
-            // @ts-ignore
-            setIsCorrect(true);
-        } else {
-            // @ts-ignore
-            setIsCorrect(false);
-        }
+    if (!data) {
+        return <div>Loading...</div>;
     }
 
-    // @ts-ignore
-    // @ts-ignore
+    function validateAnswer() {
+        const correctAnswerIndex = String(data?.content?.correctAnswer);
+        const selectedIndex = String(data?.content?.options?.indexOf(selectedAnswer));
+        setIsCorrect(selectedIndex === correctAnswerIndex);
+    }
+
     return (
         <div id={`task-${taskId}`} className="p-4 rounded-md flex flex-col justify-center items-center">
             <h2 className="text-3xl font-semibold mb-6">Multiple-Choice Aufgabe</h2>
-            <span className="mb-6 w-3/6 text-center">{data.content.scenario}</span>
+            <span className="mb-6 w-3/6 text-center">{data?.content?.question}</span>
 
             <div className="flex flex-col gap-4 mt-4">
-                {data.content.options.map((option, index) => (
+                {data?.content?.options?.map((option, index) => (
                     <label key={index} className="flex items-center gap-3 bg-gray-100 p-3 rounded-lg cursor-pointer hover:bg-gray-200 transition">
                         <input
                             type="radio"
