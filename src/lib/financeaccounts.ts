@@ -9,7 +9,7 @@ const ACCOUNTS = [
     { name: "Personalaufwand", aliases: ["PA"] },
 
     /* Aktive */
-    { name: "Post"},
+    { name: "Post", aliases: ["Po"]},
     { name: "Aktive Rechnungsabgrenzungen", aliases: ["ARA","Aktive RA"] },
     { name: "Wertschriften", aliases: ["WS"] },
     { name: "Vorsteuer MWST 1170", aliases: ["Vorsteuer 1170", "Vorst. 1170"] },
@@ -39,9 +39,9 @@ const ACCOUNTS = [
     { name: "Passivdarlehen", aliases: ["PassivD"]},
     { name: "Aktienkapital", aliases: ["AK"]},
     { name: "Gesetzliche Gewinnreserve", aliases: ["Ges. Gewinnres.", "Gesetzliche Gewinnres."]},
-    { name: "Gewinnvortrag"},
-    { name: "Jahresgewinn"},
-    { name: "Privat"},
+    { name: "Gewinnvortrag", aliases: []},
+    { name: "Jahresgewinn", aliases: []},
+    { name: "Privat", aliases: []},
 
     /*Erträge*/
     { name: "Produktionserlöse", aliases: ["ProduktionsE","ProdE"] },
@@ -61,7 +61,7 @@ const ACCOUNTS = [
     { name: "Sozialversicherungsaufwand", aliases: ["Soz. VersA","Soz. Vers. Aufwand"] },
     { name: "Übriger Personalaufwand", aliases: ["Übr. Personalaufwand","Übr. PersA"] },
     { name: "Raumaufwand", aliases: ["RaumA"] },
-    { name: "Reparaturen"},
+    { name: "Reparaturen", aliases: []},
     { name: "Fahrzeugaufwand", aliases: ["FzA", "FahrzeugA"]},
     { name: "Versicherungsaufwand", aliases: ["VersA"]},
     { name: "Energieaufwand", aliases: ["EnergieA"]},
