@@ -1,14 +1,13 @@
 const ACCOUNTS = [
-    { name: "Kasse", aliases: ["Ka"] },
-    { name: "Bank", aliases: ["Ba"] },
+
     { name: "Forderungen aus Lieferungen und Leistungen", aliases: ["Ford. L+L", "FLL"] },
     { name: "Verbindlichkeiten aus Lieferungen und Leistungen", aliases: ["Verb. L+L", "VLL"] },
     { name: "Eigenkapital", aliases: ["EK"] },
-    { name: "Umsatzerlöse", aliases: ["UE"] },
-    { name: "Materialaufwand", aliases: ["MA"] },
-    { name: "Personalaufwand", aliases: ["PA"] },
+    { name: "Personalaufwand", aliases: ["PersonalA", "PA"] },
 
     /* Aktive */
+    { name: "Kasse", aliases: ["Ka"] },
+    { name: "Bank", aliases: ["Ba"] },
     { name: "Post", aliases: ["Po"]},
     { name: "Aktive Rechnungsabgrenzungen", aliases: ["ARA","Aktive RA"] },
     { name: "Wertschriften", aliases: ["WS"] },
@@ -31,7 +30,7 @@ const ACCOUNTS = [
     /*Pasive*/
     { name: "Verbindlichkeiten MWST", aliases: ["Verb. MWST"] },
     { name: "Verbindlichkeiten Verechnungssteuer", aliases: ["Verb. Verechnungssteuer","Verb. VST."] },
-    { name: "Dividenden"},
+    { name: "Dividenden", aliases: []},
     { name: "Verbindlichkeiten Sozialversicherungen", aliases: ["Verb. Sozialversicherungen", "Verb. Soz. vers.", "Verb. Sozialvers."]},
     { name: "Passive Rechnungsabgrenzungen", aliases: ["Passive RA", "PRA"]},
     { name: "Rückstellungen", aliases: ["Rs"]},
