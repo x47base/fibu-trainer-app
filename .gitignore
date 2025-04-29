@@ -3,6 +3,7 @@
 # dependencies
 .idea
 /node_modules
+.idea
 /.pnp
 .pnp.*
 .yarn/*
