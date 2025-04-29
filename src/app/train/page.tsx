@@ -44,28 +44,28 @@ export default function TrainPage() {
                                 onClick={() => setSelectedTask("kreuze")}
                             >
                                 <h3 className="font-semibold">Konten Kreuze</h3>
-                                <p className="text-gray-500">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                                <p className="text-gray-500">Kontenkreuzaufgaben, bei denen ihr die richigen Beträge im Soll beziehungsweise Haben eintragen müsst.</p>
                             </div>
                             <div
                                 className={`p-4 border rounded-lg cursor-pointer ${selectedTask === "buchungen" ? "border-themecolor" : "border-gray-300"}`}
                                 onClick={() => setSelectedTask("buchungen")}
                             >
                                 <h3 className="font-semibold">Buchungen</h3>
-                                <p className="text-gray-500">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                                <p className="text-gray-500">Allgemeine Buchungssätze</p>
                             </div>
                             <div
                                 className={`p-4 border rounded-lg cursor-pointer ${selectedTask === "multiple-choice" ? "border-themecolor" : "border-gray-300"}`}
                                 onClick={() => setSelectedTask("multiple-choice")}
                             >
                                 <h3 className="font-semibold">Multiple Choice</h3>
-                                <p className="text-gray-500">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                                <p className="text-gray-500">Multiple Choice Fragen zum Thema Finanz- und Rechnungswesen.</p>
                             </div>
                             <div
                                 className={`p-4 border rounded-lg cursor-pointer ${selectedTask === "lueckentext" ? "border-themecolor" : "border-gray-300"}`}
                                 onClick={() => setSelectedTask("lueckentext")}
                             >
                                 <h3 className="font-semibold">Lückentext</h3>
-                                <p className="text-gray-500">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                                <p className="text-gray-500">Lückentextaufgaben: Fülle die Lücken mit dem Korrekten Konto.</p>
                             </div>
                         </div>
 
