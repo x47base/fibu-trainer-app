@@ -23,7 +23,7 @@ const links: Link[] = [
     {
         name: "Dashboard",
         path: "/dashboard",
-        adminrequired: true,
+        adminrequired: false,
     }
 ];
 

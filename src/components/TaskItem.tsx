@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TaskContext } from "@/app/dashboard/layout";
 import { useRouter } from "next/navigation";
+import { FaGlobe, FaLock } from "react-icons/fa";
 
 interface Task {
     _id: number;
@@ -13,13 +14,13 @@ interface Task {
 
 interface TaskItemProps {
     task: Task;
+    privacy: "öffentlich" | "privat";
     onDelete?: (id: number) => void;
 }
 
-export default function TaskItem({ task, onDelete }: TaskItemProps) {
+export default function TaskItem({ task, privacy, onDelete }: TaskItemProps) {
     const { selectedTaskId, setSelectedTaskId } = useContext(TaskContext);
     const isSelected = selectedTaskId === task._id;
-
     const router = useRouter();
 
     const handleDelete = async () => {
@@ -36,15 +37,27 @@ export default function TaskItem({ task, onDelete }: TaskItemProps) {
 
     return (
         <div
-            className={`border border-gray-300 rounded-lg shadow-sm overflow-hidden w-full ${isSelected ? "ring-2 ring-themecolor" : ""}`}
+            className={`border border-gray-300 rounded-lg shadow-sm overflow-hidden w-full ${
+                isSelected ? "ring-2 ring-themecolor" : ""
+            }`}
             onClick={() => setSelectedTaskId(isSelected ? null : task._id)}
         >
             <div className="p-4 bg-white cursor-pointer hover:bg-gray-50">
-                <h3 className="text-lg font-bold text-themecolor truncate">Aufgabe #{task._id}</h3>
-                <p className="text-sm text-gray-600 truncate">
+                <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-bold text-themecolor truncate">
+                        {`Aufgabe #${task._id}`}
+                    </h3>
+                    {privacy === "öffentlich" ? (
+                        <FaGlobe className="text-xl text-green-600 ml-2" aria-label="Öffentlich" />
+                    ) : (
+                        <FaLock className="text-xl text-gray-600 ml-2" aria-label="Privat" />
+                    )}
+                </div>
+                <p className="text-sm text-gray-600 truncate mt-1">
                     Typ: {task.type}; Tags: {task.tags.join("; ")}
                 </p>
             </div>
+
             <AnimatePresence>
                 {isSelected && (
                     <motion.div

@@ -9,6 +9,7 @@ declare module "next-auth" {
         image?: string | null;
         password?: string;
         admin?: boolean;
+        role?: "user" | "admin";
     }
 
     interface Session {
@@ -16,7 +17,8 @@ declare module "next-auth" {
             email: string;
             name?: string | null;
             image?: string | null;
-            admin?: boolean
+            admin?: boolean;
+            role?: "user" | "admin";
         } & DefaultSession["user"];
         status: "authenticated" | "unauthenticated";
     }
@@ -29,5 +31,6 @@ declare module "next-auth/jwt" {
         image?: string | null;
         status?: "authenticated" | "unauthenticated";
         admin?: boolean;
+        role?: "user" | "admin";
     }
 }

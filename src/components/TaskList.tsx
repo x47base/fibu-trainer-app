@@ -16,6 +16,7 @@ export default function TaskList({ tasks, setTasks }: TaskListProps) {
                             onDelete={(id) =>
                                 setTasks(tasks.filter((t) => t._id !== id))
                             }
+                            privacy={task.isPublic ? "öffentlich" : "privat"}
                         />
                     </div>
                 ))

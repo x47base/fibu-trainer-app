@@ -20,7 +20,7 @@ export async function GET(request: Request) {
         });
     } catch (error) {
         console.error("Error exporting tasks:", error);
-        return NextResponse.error();
+        return NextResponse.json({ message: "Internal server error" }, { status: 500 });
     }
 }
 
@@ -32,34 +32,51 @@ export async function POST(request: Request) {
         }
 
         const uniqueTasks = Array.from(new Map(body.map((t: any) => [t._id, t])).values());
-        
+
         const client = await clientPromise;
         const db = client.db();
-        
-        const taskIds = uniqueTasks.map((task: any) => task._id);
-        const existingTasks = await db.collection("tasks")
+
+        const maxTasks = uniqueTasks.length;
+        const counter = await db.collection("counters").findOneAndUpdate(
+            { _id: "taskId" },
+            { $inc: { seq: maxTasks } },
+            { upsert: true, returnDocument: "after" }
+        );
+        const startId = (counter?.value?.seq || 1) - maxTasks + 1;
+
+        const tasksToInsert = uniqueTasks.map((task: any, index: number) => ({
+            ...task,
+            _id: startId + index,
+            isPublic: task.isPublic !== undefined ? task.isPublic : false,
+            createdBy: task.createdBy || "N/A",
+            createdAt: new Date().toISOString(),
+        }));
+
+        const taskIds = tasksToInsert.map((task: any) => task._id);
+        const existingTasks = await db
+            .collection("tasks")
             .find({ _id: { $in: taskIds } })
             .project({ _id: 1 })
             .toArray();
         const existingIds = new Set(existingTasks.map((task: any) => task._id));
-        
-        const tasksToInsert = uniqueTasks.filter((task: any) => !existingIds.has(task._id));
-        if (tasksToInsert.length === 0) {
+
+        const newTasks = tasksToInsert.filter((task: any) => !existingIds.has(task._id));
+        if (newTasks.length === 0) {
             return NextResponse.json({ message: "Keine neuen Tasks zum Importieren." }, { status: 200 });
         }
 
-        const result = await db.collection("tasks").insertMany(tasksToInsert);
+        const result = await db.collection("tasks").insertMany(newTasks);
         const updatedTasks = await db.collection("tasks").find({}).toArray();
         return NextResponse.json(
             {
                 message: "Import erfolgreich",
                 insertedCount: result.insertedCount,
-                tasks: updatedTasks
+                tasks: updatedTasks,
             },
             { status: 201 }
         );
     } catch (error) {
         console.error("Error importing tasks:", error);
-        return NextResponse.error();
+        return NextResponse.json({ message: "Internal server error" }, { status: 500 });
     }
 }

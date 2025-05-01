@@ -12,7 +12,14 @@ export default function TasksPage() {
         const fetchTasks = async () => {
             const res = await fetch("/api/tasks");
             const data = await res.json();
-            setTasks(data);
+            const sessionRes = await fetch("/api/auth/session");
+            const session = await sessionRes.json();
+
+            const filteredTasks = session.user.role === "admin"
+                ? data
+                : data.filter((task: Task) => task.isPublic || task.createdBy === session.user.email);
+
+            setTasks(filteredTasks);
         };
         fetchTasks();
     }, []);

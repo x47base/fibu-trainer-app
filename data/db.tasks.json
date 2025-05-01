@@ -1,0 +1,1050 @@
+[
+    {
+        "_id": 1,
+        "type": "booking",
+        "content": {
+            "scenario": "Bankbelastung für Zinsen: CHF 700.00.",
+            "bookings": [
+                {
+                    "soll": "Finanzaufwand",
+                    "haben": "Bank",
+                    "betrag": 700
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Aufwand und Ertrag",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:00:00.000Z"
+    },
+    {
+        "_id": 2,
+        "type": "booking",
+        "content": {
+            "scenario": "Kreditkauf einer neuen EDV-Anlage bei der SPIRA AG: CHF 9,600.00.",
+            "bookings": [
+                {
+                    "soll": "Mobiliar",
+                    "haben": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "betrag": 9600
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Aktiven und Passiven",
+            "Kreditoren"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:01:00.000Z"
+    },
+    {
+        "_id": 3,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir zahlen die Rechnung der SPIRA AG unter Abzug von 2% Skonto per Bank: CHF 9,408.00 wird überwiesen, CHF 192.00 Skonto.",
+            "bookings": [
+                {
+                    "soll": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "haben": "Bank",
+                    "betrag": 9408
+                },
+                {
+                    "soll": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "haben": "Mobiliar",
+                    "betrag": 192
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Kreditoren",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:02:00.000Z"
+    },
+    {
+        "_id": 4,
+        "type": "booking",
+        "content": {
+            "scenario": "Der Lehrling übernimmt die alte EDV-Anlage für CHF 300.00. Der Betrag wird mit seinem Lohn verrechnet.",
+            "bookings": [
+                {
+                    "soll": "Übriger Personalaufwand",
+                    "haben": "Mobiliar",
+                    "betrag": 300
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Aktiven und Passiven",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:03:00.000Z"
+    },
+    {
+        "_id": 5,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir kaufen eine Liegenschaft im Wert von CHF 1,600,000.00. Die darauf lastende Hypothek in der Höhe von CHF 900,000.00 übernehmen wir. Die Restzahlung erfolgt mit Banküberweisung.",
+            "bookings": [
+                {
+                    "soll": "Liegenschaften",
+                    "haben": "Bank",
+                    "betrag": 700000
+                },
+                {
+                    "soll": "Liegenschaften",
+                    "haben": "Hypotheken",
+                    "betrag": 900000
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Aktiven und Passiven",
+            "Anlagenbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:04:00.000Z"
+    },
+    {
+        "_id": 6,
+        "type": "booking",
+        "content": {
+            "scenario": "Unser Geschäftsfahrzeug mit Buchwert von CHF 18,000.00 wird um 25% abgeschrieben.",
+            "bookings": [
+                {
+                    "soll": "Abschreibungen",
+                    "haben": "Fahrzeuge",
+                    "betrag": 4500
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Abschreibung",
+            "Anlagenbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:05:00.000Z"
+    },
+    {
+        "_id": 7,
+        "type": "booking",
+        "content": {
+            "scenario": "Bankgutschrift für Rückzahlung Darlehen: CHF 50,000.00 und Darlehenszins: CHF 3,000.00.",
+            "bookings": [
+                {
+                    "soll": "Bank",
+                    "haben": "Aktivdarlehen",
+                    "betrag": 50000
+                },
+                {
+                    "soll": "Bank",
+                    "haben": "Finanzertrag",
+                    "betrag": 3000
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Aktiven und Passiven",
+            "Aufwand und Ertrag"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:06:00.000Z"
+    },
+    {
+        "_id": 8,
+        "type": "booking",
+        "content": {
+            "scenario": "Honorarrechnung an Kunde G. Frei für Steuerberatungen: CHF 7,200.00.",
+            "bookings": [
+                {
+                    "soll": "Forderungen aus Lieferungen und Leistungen",
+                    "haben": "Dienstleistungserlöse",
+                    "betrag": 7200
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Debitoren",
+            "Aufwand und Ertrag"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:07:00.000Z"
+    },
+    {
+        "_id": 9,
+        "type": "booking",
+        "content": {
+            "scenario": "Kunde G. Frei ist nicht einverstanden mit der Rechnung. Wir gewähren 5% Rabatt: CHF 360.00.",
+            "bookings": [
+                {
+                    "soll": "Dienstleistungserlöse",
+                    "haben": "Forderungen aus Lieferungen und Leistungen",
+                    "betrag": 360
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Debitoren",
+            "Aufwand und Ertrag"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:08:00.000Z"
+    },
+    {
+        "_id": 10,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir senden Waren in der Höhe von CHF 2,000.00 inkl. 8% MWST an Kunde Frey: Nettomethode.",
+            "bookings": [
+                {
+                    "soll": "Forderungen aus Lieferungen und Leistungen",
+                    "haben": "Warenerlöse",
+                    "betrag": 1851.85
+                },
+                {
+                    "soll": "Forderungen aus Lieferungen und Leistungen",
+                    "haben": "Verbindlichkeiten MWST",
+                    "betrag": 148.15
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Debitoren",
+            "Aufwand und Ertrag"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:09:00.000Z"
+    },
+    {
+        "_id": 11,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir kaufen diverse Computer im Wert von CHF 10,300.00 inkl. 8% MWST: Nettomethode.",
+            "bookings": [
+                {
+                    "soll": "Mobiliar",
+                    "haben": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "betrag": 9537.05
+                },
+                {
+                    "soll": "Vorsteuer MWST 1170",
+                    "haben": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "betrag": 762.95
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Aktiven und Passiven",
+            "Kreditoren"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:10:00.000Z"
+    },
+    {
+        "_id": 12,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir senden Waren aufgrund von Mängeln an den Lieferanten zurück. Der Wert CHF 3,000.00 inkl. 8% MWST: Nettomethode.",
+            "bookings": [
+                {
+                    "soll": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "haben": "Warenaufwand",
+                    "betrag": 2777.8
+                },
+                {
+                    "soll": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "haben": "Vorsteuer MWST 1170",
+                    "betrag": 222.2
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Kreditoren",
+            "Aufwand und Ertrag"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:11:00.000Z"
+    },
+    {
+        "_id": 13,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir kaufen Medikamente für den Notfallschrank ein. Der Wert beträgt CHF 300 inkl. 2.5% MWST: Nettomethode.",
+            "bookings": [
+                {
+                    "soll": "Sonstiger Betriebsaufwand",
+                    "haben": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "betrag": 292.7
+                },
+                {
+                    "soll": "Vorsteuer MWST 1170",
+                    "haben": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "betrag": 7.3
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Kreditoren",
+            "Aufwand und Ertrag"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:12:00.000Z"
+    },
+    {
+        "_id": 14,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir zahlen die Rechnung für den Wareneinkauf (schon verbucht) via Bank: CHF 3,500.00 inkl. 8% MWST.",
+            "bookings": [
+                {
+                    "soll": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "haben": "Bank",
+                    "betrag": 3500
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Kreditoren",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:13:00.000Z"
+    },
+    {
+        "_id": 15,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir bezahlen die Miete für den Monat April via Bank: CHF 3,790.00.",
+            "bookings": [
+                {
+                    "soll": "Raumaufwand",
+                    "haben": "Bank",
+                    "betrag": 3790
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Aufwand und Ertrag",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:14:00.000Z"
+    },
+    {
+        "_id": 16,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir bezahlen die verbuchte Rechnung vom 30.04. von total CHF 10,000.00 inkl. 8% MWST unter Abzug von 2% Skonto via Bank: Nettomethode.",
+            "bookings": [
+                {
+                    "soll": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "haben": "Bank",
+                    "betrag": 9800
+                },
+                {
+                    "soll": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "haben": "Warenaufwand",
+                    "betrag": 185.2
+                },
+                {
+                    "soll": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "haben": "Vorsteuer MWST 1170",
+                    "betrag": 14.8
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Kreditoren",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:15:00.000Z"
+    },
+    {
+        "_id": 17,
+        "type": "booking",
+        "content": {
+            "scenario": "Ende Jahr schreiben wir unsere Maschine um CHF 1,000.00 direkt ab.",
+            "bookings": [
+                {
+                    "soll": "Abschreibungen",
+                    "haben": "Maschinen",
+                    "betrag": 1000
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Abschreibung",
+            "Anlagenbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:17:00.000Z"
+    },
+    {
+        "_id": 18,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir schreiben unseren PC direkt um CHF 2,000.00 ab.",
+            "bookings": [
+                {
+                    "soll": "Abschreibungen",
+                    "haben": "Mobiliar",
+                    "betrag": 2000
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Abschreibung",
+            "Anlagenbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:18:00.000Z"
+    },
+    {
+        "_id": 19,
+        "type": "booking",
+        "content": {
+            "scenario": "Anschaffungswert des Fahrzeuges CHF 50,000.00, Abschreibung degressiv und direkt 40%. Wie lautet die Buchung im 2. Jahr?",
+            "bookings": [
+                {
+                    "soll": "Abschreibungen",
+                    "haben": "Fahrzeuge",
+                    "betrag": 12000
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Abschreibung",
+            "Anlagenbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:19:00.000Z"
+    },
+    {
+        "_id": 20,
+        "type": "booking",
+        "content": {
+            "scenario": "Das Mobiliar schreiben wir indirekt um CHF 500.00 ab.",
+            "bookings": [
+                {
+                    "soll": "Abschreibungen",
+                    "haben": "Werteberichtigung Mobiliar und Einrichtungen",
+                    "betrag": 500
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Abschreibung",
+            "Anlagenbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:20:00.000Z"
+    },
+    {
+        "_id": 21,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir kaufen eine Maschine für CHF 100,000.00 und schreiben Ende Jahr 25% vom Anschaffungswert indirekt ab.",
+            "bookings": [
+                {
+                    "soll": "Abschreibungen",
+                    "haben": "Werteberichtigung Maschinen",
+                    "betrag": 25000
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Abschreibung",
+            "Anlagenbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:21:00.000Z"
+    },
+    {
+        "_id": 22,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir schreiben eine Maschine mit einem Anschaffungswert von CHF 40,000.00 über 10 Jahre linear und direkt ab.",
+            "bookings": [
+                {
+                    "soll": "Abschreibungen",
+                    "haben": "Maschinen",
+                    "betrag": 4000
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Abschreibung",
+            "Anlagenbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:22:00.000Z"
+    },
+    {
+        "_id": 23,
+        "type": "booking",
+        "content": {
+            "scenario": "Am 31.12. schreiben wir unsere Maschine indirekt um CHF 25,000.00 ab.",
+            "bookings": [
+                {
+                    "soll": "Abschreibungen",
+                    "haben": "Werteberichtigung Maschinen",
+                    "betrag": 25000
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Abschreibung",
+            "Anlagenbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:23:00.000Z"
+    },
+    {
+        "_id": 24,
+        "type": "booking",
+        "content": {
+            "scenario": "Ein Auto wird um 25% direkt und degressiv abgeschrieben, der Buchwert vor der Abschreibung beträgt CHF 20,000.00.",
+            "bookings": [
+                {
+                    "soll": "Abschreibungen",
+                    "haben": "Fahrzeuge",
+                    "betrag": 5000
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Abschreibung",
+            "Anlagenbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:24:00.000Z"
+    },
+    {
+        "_id": 25,
+        "type": "booking",
+        "content": {
+            "scenario": "Von unserem Warenlieferanten erwarten wir eine Gutschrift in der Höhe von CHF 700.00. Diese ist am Jahresende noch nicht eingetroffen.",
+            "bookings": [
+                {
+                    "soll": "Aktive Rechnungsabgrenzungen",
+                    "haben": "Warenaufwand",
+                    "betrag": 700
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Rechnungsabgrenzung",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:25:00.000Z"
+    },
+    {
+        "_id": 26,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir gewähren unserem Grosskunden auf die Honorarrechnungen des laufenden Jahres einen Mengenrabatt. Die Gutschrift werden wir erst im Januar ausstellen. Wir schätzen den Betrag auf CHF 10,500.00.",
+            "bookings": [
+                {
+                    "soll": "Dienstleistungserlöse",
+                    "haben": "Passive Rechnungsabgrenzungen",
+                    "betrag": 10500
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Rechnungsabgrenzung",
+            "Aufwand und Ertrag"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:26:00.000Z"
+    },
+    {
+        "_id": 27,
+        "type": "booking",
+        "content": {
+            "scenario": "Die Rechnung für die Reparatur unseres Lieferwagens ist am 31.12. noch nicht eingetroffen. Wir schätzen den Betrag auf CHF 2,000.00.",
+            "bookings": [
+                {
+                    "soll": "Fahrzeugaufwand",
+                    "haben": "Passive Rechnungsabgrenzungen",
+                    "betrag": 2000
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Rechnungsabgrenzung",
+            "Aufwand und Ertrag"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:27:00.000Z"
+    },
+    {
+        "_id": 28,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir haben einen Angestellten im Monat Dezember seinen Lohn für den Monat Januar in der Höhe von CHF 3,800.00 im voraus bezahlt.",
+            "bookings": [
+                {
+                    "soll": "Aktive Rechnungsabgrenzungen",
+                    "haben": "Übriger Personalaufwand",
+                    "betrag": 3800
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Rechnungsabgrenzung",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:28:00.000Z"
+    },
+    {
+        "_id": 29,
+        "type": "booking",
+        "content": {
+            "scenario": "Die Telefonrechnung ist noch ausstehend. Wir berücksichtigen CHF 250.00.",
+            "bookings": [
+                {
+                    "soll": "Verwaltungsaufwand",
+                    "haben": "Passive Rechnungsabgrenzungen",
+                    "betrag": 250
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Rechnungsabgrenzung",
+            "Aufwand und Ertrag"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:29:00.000Z"
+    },
+    {
+        "_id": 30,
+        "type": "booking",
+        "content": {
+            "scenario": "Gehaltsgutschrift des Geschäftsinhabers für den Monat Februar: CHF 7,000.00.",
+            "bookings": [
+                {
+                    "soll": "Übriger Personalaufwand",
+                    "haben": "Privat",
+                    "betrag": 7000
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Aufwand und Ertrag",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:30:00.000Z"
+    },
+    {
+        "_id": 31,
+        "type": "booking",
+        "content": {
+            "scenario": "Der Geschäftsinhaber lässt sich vom Postkonto CHF 4,000.00 auf sein persönliches Bankkonto gutschreiben.",
+            "bookings": [
+                {
+                    "soll": "Privat",
+                    "haben": "Post",
+                    "betrag": 4000
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:31:00.000Z"
+    },
+    {
+        "_id": 32,
+        "type": "booking",
+        "content": {
+            "scenario": "Die letzte Rate der Staats- und Gemeindesteuern des Geschäftsinhabers wird vom Geschäft mit Banküberweisung bezahlt: CHF 7,000.00.",
+            "bookings": [
+                {
+                    "soll": "Privat",
+                    "haben": "Bank",
+                    "betrag": 7000
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:32:00.000Z"
+    },
+    {
+        "_id": 33,
+        "type": "booking",
+        "content": {
+            "scenario": "Zinsgutschrift 6% vom Eigenkapital von CHF 150,000.00.",
+            "bookings": [
+                {
+                    "soll": "Finanzaufwand",
+                    "haben": "Privat",
+                    "betrag": 9000
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Aufwand und Ertrag",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:33:00.000Z"
+    },
+    {
+        "_id": 34,
+        "type": "booking",
+        "content": {
+            "scenario": "Vor dem Abschluss weist das Konto Privat einen Sollüberschuss in der Höhe von CHF 7,800.00 auf.",
+            "bookings": [
+                {
+                    "soll": "Eigenkapital",
+                    "haben": "Privat",
+                    "betrag": 7800
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Aktiven und Passiven",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:34:00.000Z"
+    },
+    {
+        "_id": 35,
+        "type": "booking",
+        "content": {
+            "scenario": "Barbezüge des Geschäftsinhabers für private Zwecke: CHF 700.00.",
+            "bookings": [
+                {
+                    "soll": "Privat",
+                    "haben": "Kasse",
+                    "betrag": 700
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:35:00.000Z"
+    },
+    {
+        "_id": 36,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir kaufen Waren im Wert von EUR 30,000.00 ein (verbuchter Kurs: CHF 1.36). Nun zahlen wir die Rechnung über unser Bankkonto mit einem Kurs von CHF 1.32.",
+            "bookings": [
+                {
+                    "soll": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "haben": "Bank",
+                    "betrag": 39600
+                },
+                {
+                    "soll": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "haben": "Warenaufwand",
+                    "betrag": 1200
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Kreditoren",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:36:00.000Z"
+    },
+    {
+        "_id": 37,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir verkaufen Waren im Wert von USD 20,000.00 (verbuchter Kurs: CHF 1.05). Nun zahlt der Kunde auf unser Bankkonto die offene Rechnung zu einem Kurs von CHF 1.07 ein.",
+            "bookings": [
+                {
+                    "soll": "Bank",
+                    "haben": "Forderungen aus Lieferungen und Leistungen",
+                    "betrag": 21400
+                },
+                {
+                    "soll": "Forderungen aus Lieferungen und Leistungen",
+                    "haben": "Warenerlöse",
+                    "betrag": 200
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Debitoren",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:37:00.000Z"
+    },
+    {
+        "_id": 38,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir kaufen Waren im Wert von EUR 10,000.00 ein (verbuchter Kurs: CHF 1.35). Nun zahlen wir die Rechnung über unser Bankkonto mit einem Kurs von CHF 1.37.",
+            "bookings": [
+                {
+                    "soll": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "haben": "Bank",
+                    "betrag": 13700
+                },
+                {
+                    "soll": "Warenaufwand",
+                    "haben": "Verbindlichkeiten aus Lieferungen und Leistungen",
+                    "betrag": 200
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Kreditoren",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:38:00.000Z"
+    },
+    {
+        "_id": 39,
+        "type": "booking",
+        "content": {
+            "scenario": "Wir verkaufen Waren im Wert von USD 8,500.00 (verbuchter Kurs: CHF 1.011). Nun zahlt der Kunde auf unser Bankkonto die offene Rechnung zu einem Kurs von CHF 1.03 ein.",
+            "bookings": [
+                {
+                    "soll": "Bank",
+                    "haben": "Forderungen aus Lieferungen und Leistungen",
+                    "betrag": 8755
+                },
+                {
+                    "soll": "Forderungen aus Lieferungen und Leistungen",
+                    "haben": "Warenerlöse",
+                    "betrag": 170
+                }
+            ]
+        },
+        "tags": [
+            "Buchungssatz",
+            "Debitoren",
+            "Finanzbuchhaltung"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:39:00.000Z"
+    },
+    {
+        "_id": 40,
+        "type": "text",
+        "content": {
+            "text": "Die {0} erhöhen das Eigenkapital.",
+            "answers": [
+                "Einlagen",
+                "Einlage"
+            ]
+        },
+        "tags": [
+            "Grundlagen",
+            "Eigenkapital"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:00:00.000Z"
+    },
+    {
+        "_id": 41,
+        "type": "text",
+        "content": {
+            "text": "Die {0} reduzieren das Vermögen.",
+            "answers": [
+                "Auszahlungen",
+                "Entnahmen"
+            ]
+        },
+        "tags": [
+            "Grundlagen",
+            "Vermögen"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:01:00.000Z"
+    },
+    {
+        "_id": 42,
+        "type": "multiple-choice",
+        "content": {
+            "question": "Welches Konto wird bei einer Bareinzahlung belastet?",
+            "options": [
+                "Kasse",
+                "Bank",
+                "Eigenkapital",
+                "Verbindlichkeiten aus Lieferungen und Leistungen"
+            ],
+            "correctAnswer": 0
+        },
+        "tags": [
+            "Buchhaltung",
+            "Kasse"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:02:00.000Z"
+    },
+    {
+        "_id": 43,
+        "type": "multiple-choice",
+        "content": {
+            "question": "Was ist eine Abschreibung?",
+            "options": [
+                "Ein Zahlungseingang",
+                "Wertminderung von Anlagevermögen",
+                "Eine Steuer",
+                "Ein Kredit"
+            ],
+            "correctAnswer": 1
+        },
+        "tags": [
+            "Abschreibung",
+            "Anlagevermögen"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:03:00.000Z"
+    },
+    {
+        "_id": 44,
+        "type": "drag-drop",
+        "content": {
+            "account": "Kasse",
+            "scenario": "Verbuchen Sie die folgenden Transaktionen auf das Kassenkonto.",
+            "initialSide": "soll",
+            "anfangsbestand": 2000,
+            "soll": [
+                "1500",
+                "800"
+            ],
+            "haben": [
+                "1000"
+            ],
+            "saldo": 3300
+        },
+        "tags": [
+            "Kontenkreuz",
+            "Kasse"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:06:00.000Z"
+    },
+    {
+        "_id": 45,
+        "type": "drag-drop",
+        "content": {
+            "account": "Bank",
+            "scenario": "Verbuchen Sie die Transaktionen auf das Bankkonto.",
+            "initialSide": "haben",
+            "anfangsbestand": 5000,
+            "soll": [
+                "2000"
+            ],
+            "haben": [
+                "3000",
+                "1000"
+            ],
+            "saldo": -2000
+        },
+        "tags": [
+            "Kontenkreuz",
+            "Bank"
+        ],
+        "isPublic": true,
+        "createdBy": "N/A",
+        "createdAt": "2025-04-30T12:07:00.000Z"
+    }
+]

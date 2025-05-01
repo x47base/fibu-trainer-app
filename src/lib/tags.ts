@@ -1,9 +1,23 @@
 const TASKTAGS = [
-    "Buchung",
-    "Rechnung",
-    "Mehrwertsteuer",
+    "Aktiven und Passiven",
+    "Aufwand und Ertrag",
+    "Doppelte Buchhaltung",
+    "Soll und Haben",
+    "Bilanz",
+    "Bestandskonto",
+    "Buchungssatz",
     "Abschreibung",
-    /* TODO: more tags ... */
+    "Anschaffungskosten",
+    "Anlagenbuchhaltung",
+    "Erfolgsrechnung",
+    "Debitoren",
+    "Kreditoren",
+    "Realisationsprinzip",
+    "Finanzbuchhaltung",
+    "Rechnungsabgrenzung",
+    "Bewertung",
+    "Einnahmen-Überschuss-Rechnung",
+    /* weitere… */
 ];
 
 export default TASKTAGS;

@@ -148,23 +148,21 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
                 {/* Mobile Dashboard Navbar */}
                 <nav className="md:hidden fixed bottom-4 left-4 right-4 bg-themecolor text-white p-3 rounded-lg shadow-lg flex justify-around items-center z-50 max-w-md mx-auto">
-                    {/* Core Navigation Buttons */}
                     <Link
-                        href="/dashboard"
+                        href="/editor"
                         className="p-2 rounded-full hover:bg-themecolorhover transition-colors"
-                        title="Dashboard"
+                        title="Editor"
                     >
                         <HiOutlineViewGrid size={24} />
                     </Link>
                     <Link
-                        href="/dashboard/tasks"
+                        href="/editor/tasks"
                         className="p-2 rounded-full hover:bg-themecolorhover transition-colors"
                         title="Tasks"
                     >
                         <HiOutlineClipboardList size={24} />
                     </Link>
 
-                    {/* Conditional Action Buttons */}
                     {(isTasksPage && !selectedTaskId && !isNewTaskPage) && (
                         <button
                             onClick={handleAddTask}
@@ -229,12 +227,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                         className="hidden"
                     />
                 </nav>
-                {/* Notification */}
                 {notification && (
                     <div
-                        className={`fixed z-50 p-4 rounded shadow-lg text-white ${
-                            notification.type === "success" ? "bg-green-500" : "bg-red-500"
-                        }`}
+                        className={`fixed z-50 p-4 rounded shadow-lg text-white ${notification.type === "success" ? "bg-green-500" : "bg-red-500"
+                            }`}
                         style={
                             isMobile
                                 ? { top: "20px", left: "50%", transform: "translateX(-50%)" }
