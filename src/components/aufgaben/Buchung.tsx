@@ -6,20 +6,23 @@ import AccountInput from "../AccountInput";
 interface BuchungProps {
     task: any;
     stats: { correct: number; incorrect: number; notDone: number };
-    onResult: (isCorrect: boolean) => void;
+    onResult: (isCorrect: boolean, wrongValue?: any) => void;
     onNext: () => void;
     onSkip: () => void;
     onBack: () => void;
+    mode: "training" | "practice";
 }
 
-export default function Buchung({ task, stats, onResult, onNext, onSkip, onBack }: BuchungProps) {
+export default function Buchung({ task, stats, onResult, onNext, onSkip, onBack, mode }: BuchungProps) {
     const [inputs, setInputs] = useState<any[]>([]);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+    const [hasChecked, setHasChecked] = useState(false);
 
     useEffect(() => {
         if (task) {
             setInputs(getEmptyInputs(task));
             setIsCorrect(null);
+            setHasChecked(false);
         }
     }, [task]);
 
@@ -36,7 +39,8 @@ export default function Buchung({ task, stats, onResult, onNext, onSkip, onBack 
     const handleValidate = async () => {
         const isValid = await Validate(task, inputs);
         setIsCorrect(isValid);
-        onResult(isValid);
+        setHasChecked(true);
+        onResult(isValid, isValid ? undefined : inputs);
     };
 
     const chartData = [
@@ -124,22 +128,27 @@ export default function Buchung({ task, stats, onResult, onNext, onSkip, onBack 
                 >
                     Zurück
                 </motion.button>
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={onSkip}
-                    className="px-3 py-2 bg-gray-300 text-gray-700 text-sm font-semibold rounded-lg shadow-md hover:bg-gray-400"
-                >
-                    Überspringen
-                </motion.button>
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleValidate}
-                    className="px-3 py-2 bg-themecolor text-white text-sm font-semibold rounded-lg shadow-md hover:bg-themecolorhover"
-                >
-                    Prüfen
-                </motion.button>
+                {mode === "training" && !hasChecked && (
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={onSkip}
+                        className="px-3 py-2 bg-gray-300 text-gray-700 text-sm font-semibold rounded-lg shadow-md hover:bg-gray-400"
+                    >
+                        Überspringen
+                    </motion.button>
+                )}
+                {(mode === "practice" || (mode === "training" && !isCorrect)) && (
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleValidate}
+                        className="px-3 py-2 bg-themecolor text-white text-sm font-semibold rounded-lg shadow-md hover:bg-themecolorhover"
+                        disabled={mode === "practice" && hasChecked}
+                    >
+                        Prüfen
+                    </motion.button>
+                )}
                 {isCorrect && (
                     <motion.button
                         whileHover={{ scale: 1.05 }}

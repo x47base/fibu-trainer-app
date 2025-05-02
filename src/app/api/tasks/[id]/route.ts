@@ -8,7 +8,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const taskId = parseInt(params.id, 10);
+    const { id } = await params;
+    const taskId = parseInt(id, 10);
     if (isNaN(taskId)) {
         return NextResponse.json({ message: "Invalid task ID" }, { status: 400 });
     }
@@ -23,13 +24,11 @@ export async function GET(request: Request, { params }: { params: { id: string }
             return NextResponse.json({ message: "Task not found" }, { status: 404 });
         }
 
-        const isAdmin = session.user.role === "admin";
+        const isAdmin = session.user.role === "admin" || session.user.admin === true;
         const isCreator = task.createdBy === session.user.email;
-        if (task.isPublic && !isAdmin) {
-            return NextResponse.json({ message: "Only admins can access public tasks" }, { status: 403 });
-        }
-        if (!task.isPublic && !isCreator) {
-            return NextResponse.json({ message: "You can only access your own private tasks" }, { status: 403 });
+
+        if (!isAdmin && !task.isPublic && !isCreator) {
+            return NextResponse.json({ message: "You can only view public tasks or your own private tasks" }, { status: 403 });
         }
 
         return NextResponse.json(task, { status: 200 });
@@ -45,7 +44,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const taskId = parseInt(params.id, 10);
+    const { id } = await params;
+
+    const taskId = parseInt(id, 10);
     if (isNaN(taskId)) {
         return NextResponse.json({ message: "Invalid task ID" }, { status: 400 });
     }
@@ -63,13 +64,10 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
         const isAdmin = session.user.role === "admin";
         const isCreator = existingTask.createdBy === session.user.email;
-        
-        if (existingTask.isPublic && isAdmin) {
-            // admins can edit public tasks
-        } else {
+
+        if (existingTask.isPublic && !isAdmin) {
             return NextResponse.json({ message: "Only admins can edit public tasks" }, { status: 403 });
         }
-
         if (!existingTask.isPublic && !isCreator) {
             return NextResponse.json({ message: "You can only edit your own private tasks" }, { status: 403 });
         }
@@ -100,7 +98,9 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const taskId = parseInt(params.id, 10);
+    const { id } = await params;
+
+    const taskId = parseInt(id, 10);
     if (isNaN(taskId)) {
         return NextResponse.json({ message: "Invalid task ID" }, { status: 400 });
     }

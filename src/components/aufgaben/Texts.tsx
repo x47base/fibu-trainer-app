@@ -5,19 +5,22 @@ import { PieChart, Pie, Cell, Tooltip } from "recharts";
 interface TextsProps {
     task: any;
     stats: { correct: number; incorrect: number; notDone: number };
-    onResult: (isCorrect: boolean) => void;
+    onResult: (isCorrect: boolean, wrongValue?: any) => void;
     onNext: () => void;
     onSkip: () => void;
     onBack: () => void;
+    mode: "training" | "practice";
 }
 
-export default function Texts({ task, stats, onResult, onNext, onSkip, onBack }: TextsProps) {
+export default function Texts({ task, stats, onResult, onNext, onSkip, onBack, mode }: TextsProps) {
     const [inputValue, setInputValue] = useState("");
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+    const [hasChecked, setHasChecked] = useState(false);
 
     useEffect(() => {
         setInputValue("");
         setIsCorrect(null);
+        setHasChecked(false);
     }, [task]);
 
     if (!task) {
@@ -27,7 +30,8 @@ export default function Texts({ task, stats, onResult, onNext, onSkip, onBack }:
     const handleValidate = async () => {
         const isValid = await Validate(task.content.answers, inputValue);
         setIsCorrect(isValid);
-        onResult(isValid);
+        setHasChecked(true);
+        onResult(isValid, isValid ? undefined : inputValue);
     };
 
     const chartData = [
@@ -106,22 +110,27 @@ export default function Texts({ task, stats, onResult, onNext, onSkip, onBack }:
                 >
                     Zurück
                 </motion.button>
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={onSkip}
-                    className="px-3 py-2 bg-gray-300 text-gray-700 text-sm font-semibold rounded-lg shadow-md hover:bg-gray-400"
-                >
-                    Überspringen
-                </motion.button>
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleValidate}
-                    className="px-3 py-2 bg-themecolor text-white text-sm font-semibold rounded-lg shadow-md hover:bg-themecolorhover"
-                >
-                    Prüfen
-                </motion.button>
+                {mode === "training" && !hasChecked && (
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={onSkip}
+                        className="px-3 py-2 bg-gray-300 text-gray-700 text-sm font-semibold rounded-lg shadow-md hover:bg-gray-400"
+                    >
+                        Überspringen
+                    </motion.button>
+                )}
+                {(mode === "practice" || (mode === "training" && !isCorrect)) && (
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleValidate}
+                        className="px-3 py-2 bg-themecolor text-white text-sm font-semibold rounded-lg shadow-md hover:bg-themecolorhover"
+                        disabled={mode === "practice" && hasChecked}
+                    >
+                        Prüfen
+                    </motion.button>
+                )}
                 {isCorrect && (
                     <motion.button
                         whileHover={{ scale: 1.05 }}

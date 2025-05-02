@@ -6,7 +6,6 @@ import { FaBook, FaQuestionCircle, FaCheckSquare, FaTextHeight, FaTasks } from "
 import { motion } from "framer-motion";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import { getCanonicalTaskType } from "@/types/taskTypes";
-
 import Buchung from "@/components/aufgaben/Buchung";
 import MultipleChoice from "@/components/aufgaben/MultipleChoice";
 import DragDrop from "@/components/aufgaben/DragDrop";
@@ -15,20 +14,40 @@ import Texts from "@/components/aufgaben/Texts";
 export default function TrainPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
-    const [mode, setMode] = useState<"initial" | "training" | "practice">("initial");
+    const [mode, setMode] = useState<"initial" | "training" | "practice" | "practiceSelect">("initial");
     const [selectedTaskType, setSelectedTaskType] = useState<string | null>(null);
     const [tasks, setTasks] = useState<any[]>([]);
     const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
     const [stats, setStats] = useState({ correct: 0, incorrect: 0, notDone: 0 });
     const [showTask, setShowTask] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [examResults, setExamResults] = useState<any[]>([]);
+    const [availableTags, setAvailableTags] = useState<string[]>([]);
+    const [taskAttempts, setTaskAttempts] = useState<Set<string>>(new Set()); // Track attempted task IDs
 
     useEffect(() => {
         if (status === "loading") return;
         if (!session || status === "unauthenticated") {
             router.push("/signin");
+        } else {
+            fetchTags();
         }
     }, [session, status, router]);
+
+    const fetchTags = async () => {
+        try {
+            const response = await fetch("/api/tasks?tags=true");
+            if (!response.ok) throw new Error(`Failed to fetch tags: ${response.status}`);
+            const tags = await response.json();
+            console.log("Fetched tags:", tags);
+            const validTags = Array.from(new Set(tags.filter((tag: any) => typeof tag === "string" && tag.trim())));
+            setAvailableTags(validTags);
+        } catch (error) {
+            console.error("Error fetching tags:", error);
+            setError("Fehler beim Laden der Tags.");
+        }
+    };
 
     const fetchTasks = async (taskType: string) => {
         try {
@@ -38,6 +57,7 @@ export default function TrainPage() {
                 throw new Error(`Failed to fetch tasks: ${response.status}`);
             }
             const data = await response.json();
+            console.log("Fetched tasks for type", canonicalType, ":", data);
             if (data.length === 0) {
                 setError("Keine Aufgaben für diesen Typ verfügbar.");
                 setTasks([]);
@@ -46,9 +66,12 @@ export default function TrainPage() {
             }
             setTasks(data);
             setStats({ correct: 0, incorrect: 0, notDone: data.length });
+            setSelectedTaskType(taskType);
             setCurrentTaskIndex(0);
             setShowTask(true);
             setError(null);
+            setExamResults([]);
+            setTaskAttempts(new Set()); // Reset attempts for new task set
         } catch (error) {
             console.error("Error fetching tasks:", error);
             setError("Fehler beim Laden der Aufgaben.");
@@ -57,11 +80,251 @@ export default function TrainPage() {
         }
     };
 
-    useEffect(() => {
-        if (selectedTaskType) {
-            fetchTasks(selectedTaskType);
+    const fetchPracticeTasks = async () => {
+        try {
+            const tagsQuery = selectedTags.join(",");
+            console.log("Fetching practice tasks with tags:", tagsQuery);
+            const response = await fetch(`/api/tasks?tags=${encodeURIComponent(tagsQuery)}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch practice tasks: ${response.status}`);
+            }
+            const allTasks = await response.json();
+            console.log("Fetched practice tasks:", allTasks);
+
+            if (!Array.isArray(allTasks) || allTasks.length === 0) {
+                setError("Keine Aufgaben für die ausgewählten Tags verfügbar.");
+                setTasks([]);
+                setShowTask(false);
+                return;
+            }
+
+            const tasksByType: { [key: string]: any[] } = {
+                booking: [],
+                "multiple-choice": [],
+                text: [],
+                "drag-drop": [],
+            };
+            allTasks.forEach((task: any) => {
+                if (tasksByType[task.type]) {
+                    tasksByType[task.type].push(task);
+                } else {
+                    console.warn(`Unknown task type: ${task.type}`, task);
+                }
+            });
+            console.log("Tasks by type:", tasksByType);
+
+            const selectedTasks: any[] = [];
+            const types = Object.keys(tasksByType).filter((type) => tasksByType[type].length > 0);
+            const maxPerType = Math.ceil(17 / (types.length || 1));
+
+            for (const type of types) {
+                const tasks = tasksByType[type];
+                const shuffled = tasks.sort(() => 0.5 - Math.random());
+                selectedTasks.push(...shuffled.slice(0, Math.min(maxPerType, tasks.length)));
+            }
+
+            const finalTasks = selectedTasks.sort(() => 0.5 - Math.random()).slice(0, 17);
+            console.log("Final selected tasks:", finalTasks);
+
+            if (finalTasks.length === 0) {
+                setError("Keine Aufgaben für die ausgewählten Tags verfügbar.");
+                setTasks([]);
+                setShowTask(false);
+                return;
+            }
+
+            setTasks(finalTasks);
+            setStats({ correct: 0, incorrect: 0, notDone: finalTasks.length });
+            setCurrentTaskIndex(0);
+            setShowTask(true);
+            setError(null);
+            setExamResults([]);
+            setTaskAttempts(new Set()); // Reset attempts for new task set
+        } catch (error) {
+            console.error("Error fetching practice tasks:", error);
+            setError(`Fehler beim Laden der Aufgaben: ${error.message}`);
+            setTasks([]);
+            setShowTask(false);
         }
-    }, [selectedTaskType]);
+    };
+
+    const handleTaskStart = (type: string) => {
+        setSelectedTaskType(type);
+        fetchTasks(type);
+    };
+
+    const handleTaskResult = (isCorrect: boolean, wrongValue?: any) => {
+        const taskId = tasks[currentTaskIndex]._id;
+        if (taskAttempts.has(taskId)) {
+            // Do not update stats if task was already attempted
+            return;
+        }
+        setTaskAttempts((prev) => new Set(prev).add(taskId));
+        setStats((prev) => ({
+            correct: prev.correct + (isCorrect ? 1 : 0),
+            incorrect: prev.incorrect + (isCorrect ? 0 : 1),
+            notDone: prev.notDone - 1,
+        }));
+        setExamResults((prev) => [
+            ...prev,
+            {
+                taskId,
+                isCorrect,
+                wrongValue: isCorrect ? undefined : wrongValue,
+            },
+        ]);
+    };
+
+    const handleNextTask = () => {
+        if (currentTaskIndex < tasks.length - 1) {
+            setCurrentTaskIndex((prev) => prev + 1);
+        } else {
+            setShowTask(false);
+            if (mode === "practice") {
+                saveExamResults();
+            }
+        }
+    };
+
+    const handleSkipTask = () => {
+        if (mode === "practice") {
+            const taskId = tasks[currentTaskIndex]._id;
+            if (!taskAttempts.has(taskId)) {
+                setTaskAttempts((prev) => new Set(prev).add(taskId));
+                setStats((prev) => ({
+                    correct: prev.correct,
+                    incorrect: prev.incorrect + 1,
+                    notDone: prev.notDone - 1,
+                }));
+                setExamResults((prev) => [
+                    ...prev,
+                    {
+                        taskId,
+                        isCorrect: false,
+                        wrongValue: "skipped",
+                    },
+                ]);
+            }
+        }
+        handleNextTask();
+    };
+
+    const handleBack = () => {
+        if (showTask) {
+            setShowTask(false);
+            setSelectedTaskType(null);
+            setTasks([]);
+            setError(null);
+            setTaskAttempts(new Set()); // Reset attempts when going back
+        } else if (mode === "practiceSelect") {
+            setMode("initial");
+            setSelectedTags([]);
+        } else {
+            setMode("initial");
+        }
+    };
+
+    const saveExamResults = async () => {
+        try {
+            const maxPoints = tasks.length;
+            const pointsReceived = stats.correct;
+            const percentage = (pointsReceived / maxPoints) * 100;
+            const grade = (5 / maxPoints) * pointsReceived + 1;
+
+            const examData = {
+                date: new Date().toISOString(),
+                correct: pointsReceived,
+                maxPoints,
+                percentage,
+                grade,
+                tasks: examResults,
+            };
+
+            const response = await fetch("/api/user/exams", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(examData),
+            });
+
+            if (!response.ok) throw new Error(`Failed to save exam results: ${response.status}`);
+            console.log("Exam results saved:", examData);
+        } catch (error) {
+            console.error("Error saving exam results:", error);
+            setError("Fehler beim Speichern der Prüfungsergebnisse.");
+        }
+    };
+
+    const handleTagToggle = (tag: string) => {
+        setSelectedTags((prev) =>
+            prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+        );
+    };
+
+    const startPracticeTest = () => {
+        if (selectedTags.length === 0) {
+            setError("Bitte wähle mindestens einen Tag aus.");
+            return;
+        }
+        setMode("practice");
+        setSelectedTaskType(null);
+        fetchPracticeTasks();
+    };
+
+    const renderTaskComponent = (task: any) => {
+        switch (task.type) {
+            case "booking":
+                return (
+                    <Buchung
+                        task={task}
+                        stats={stats}
+                        onResult={handleTaskResult}
+                        onNext={handleNextTask}
+                        onSkip={handleSkipTask}
+                        onBack={handleBack}
+                        mode={mode}
+                    />
+                );
+            case "multiple-choice":
+                return (
+                    <MultipleChoice
+                        task={task}
+                        stats={stats}
+                        onResult={handleTaskResult}
+                        onNext={handleNextTask}
+                        onSkip={handleSkipTask}
+                        onBack={handleBack}
+                        mode={mode}
+                    />
+                );
+            case "text":
+                return (
+                    <Texts
+                        task={task}
+                        stats={stats}
+                        onResult={handleTaskResult}
+                        onNext={handleNextTask}
+                        onSkip={handleSkipTask}
+                        onBack={handleBack}
+                        mode={mode}
+                    />
+                );
+            case "drag-drop":
+                return (
+                    <DragDrop
+                        task={task}
+                        stats={stats}
+                        onResult={handleTaskResult}
+                        onNext={handleNextTask}
+                        onSkip={handleSkipTask}
+                        onBack={handleBack}
+                        mode={mode}
+                    />
+                );
+            default:
+                console.warn(`Unsupported task type: ${task.type}`);
+                return <div>Unbekannter Aufgabentyp: {task.type}</div>;
+        }
+    };
 
     if (status === "loading") return <div>Loading... Refresh if screen stays.</div>;
 
@@ -80,50 +343,13 @@ export default function TrainPage() {
         { id: "lueckentext", title: "Lückentext", description: "Lückentextaufgaben: Fülle die Lücken mit dem korrekten Konto.", icon: <FaTextHeight size={24} /> },
     ];
 
-    const handleTaskStart = (type: string) => {
-        setSelectedTaskType(type);
-    };
-
-    const handleTaskResult = (isCorrect: boolean) => {
-        setStats((prev) => ({
-            correct: prev.correct + (isCorrect ? 1 : 0),
-            incorrect: prev.incorrect + (isCorrect ? 0 : 1),
-            notDone: prev.notDone - 1,
-        }));
-    };
-
-    const handleNextTask = () => {
-        if (currentTaskIndex < tasks.length - 1) {
-            setCurrentTaskIndex((prev) => prev + 1);
-        } else {
-            setShowTask(false);
-        }
-    };
-
-    const handleSkipTask = () => {
-        handleNextTask(); // Skip to next task without affecting stats
-    };
-
-    const handleBack = () => {
-        if (showTask) {
-            setShowTask(false);
-            setSelectedTaskType(null);
-            setTasks([]);
-            setError(null);
-        } else {
-            setMode("initial");
-        }
-    };
-
     return (
         <div className="min-h-screen w-full bg-gray-100 flex flex-col items-center p-8">
             <main className="w-full max-w-4xl bg-white rounded-lg shadow-md p-6 mt-6">
-                {/* Error Message */}
                 {error && (
                     <div className="text-red-500 text-center mb-4">{error}</div>
                 )}
 
-                {/* Initial Choice */}
                 {mode === "initial" && (
                     <>
                         <h2 className="text-2xl font-bold text-center text-themecolor">Willkommen zum Üben</h2>
@@ -131,7 +357,7 @@ export default function TrainPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
                             {[
                                 { mode: "training", title: "Trainieren", description: "Übe verschiedene Aufgabenarten, um deine Fähigkeiten zu verbessern." },
-                                { mode: "practice", title: "Praxistest", description: "Teste dein Wissen mit einem simulierten Praxistest (Inhalt folgt)." },
+                                { mode: "practiceSelect", title: "Praxistest", description: "Teste dein Wissen mit einem simulierten Praxistest." },
                             ].map((option) => (
                                 <motion.div
                                     key={option.mode}
@@ -156,7 +382,49 @@ export default function TrainPage() {
                     </>
                 )}
 
-                {/* Task Type Selection */}
+                {mode === "practiceSelect" && (
+                    <>
+                        <h2 className="text-2xl font-bold text-center text-themecolor">Praxistest Tags auswählen</h2>
+                        <p className="text-center text-gray-500 mt-2">Wähle die Tags für deinen Praxistest.</p>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
+                            {availableTags.map((tag, index) => (
+                                <motion.div
+                                    key={`${tag}-${index}`}
+                                    variants={cardVariants}
+                                    initial="initial"
+                                    animate="animate"
+                                    whileHover="hover"
+                                    whileTap="tap"
+                                    onClick={() => handleTagToggle(tag)}
+                                    className={`relative cursor-pointer rounded-xl bg-white p-4 shadow-lg border-2 ${
+                                        selectedTags.includes(tag) ? "border-themecolor" : "border-transparent"
+                                    }`}
+                                >
+                                    <p className="text-center text-themecolor">{tag}</p>
+                                </motion.div>
+                            ))}
+                        </div>
+                        <div className="flex justify-center gap-4 mt-8">
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={handleBack}
+                                className="px-6 py-3 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600"
+                            >
+                                Zurück
+                            </motion.button>
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={startPracticeTest}
+                                className="px-6 py-3 bg-themecolor text-white font-semibold rounded-lg shadow-md hover:bg-themecolorhover"
+                            >
+                                Test starten
+                            </motion.button>
+                        </div>
+                    </>
+                )}
+
                 {mode === "training" && !showTask && (
                     <>
                         <h2 className="text-2xl font-bold text-center text-themecolor">Trainingsaufgaben auswählen</h2>
@@ -186,57 +454,16 @@ export default function TrainPage() {
                     </>
                 )}
 
-                {/* Task Display */}
-                {mode === "training" && showTask && tasks.length > 0 && (
+                {(mode === "training" || mode === "practice") && showTask && tasks.length > 0 && currentTaskIndex < tasks.length && (
                     <>
                         <h2 className="text-2xl font-bold text-center text-themecolor mb-4">
                             Aufgabe {currentTaskIndex + 1} von {tasks.length}
                         </h2>
-                        {selectedTaskType === "buchungen" && (
-                            <Buchung
-                                task={tasks[currentTaskIndex]}
-                                stats={stats}
-                                onResult={handleTaskResult}
-                                onNext={handleNextTask}
-                                onSkip={handleSkipTask}
-                                onBack={handleBack}
-                            />
-                        )}
-                        {selectedTaskType === "multiple-choice" && (
-                            <MultipleChoice
-                                task={tasks[currentTaskIndex]}
-                                stats={stats}
-                                onResult={handleTaskResult}
-                                onNext={handleNextTask}
-                                onSkip={handleSkipTask}
-                                onBack={handleBack}
-                            />
-                        )}
-                        {selectedTaskType === "lueckentext" && (
-                            <Texts
-                                task={tasks[currentTaskIndex]}
-                                stats={stats}
-                                onResult={handleTaskResult}
-                                onNext={handleNextTask}
-                                onSkip={handleSkipTask}
-                                onBack={handleBack}
-                            />
-                        )}
-                        {selectedTaskType === "kreuze" && (
-                            <DragDrop
-                                task={tasks[currentTaskIndex]}
-                                stats={stats}
-                                onResult={handleTaskResult}
-                                onNext={handleNextTask}
-                                onSkip={handleSkipTask}
-                                onBack={handleBack}
-                            />
-                        )}
+                        {renderTaskComponent(tasks[currentTaskIndex])}
                     </>
                 )}
 
-                {/* All Tasks Completed */}
-                {mode === "training" && showTask && tasks.length > 0 && currentTaskIndex >= tasks.length && (
+                {(mode === "training" || mode === "practice") && showTask && tasks.length > 0 && currentTaskIndex >= tasks.length && (
                     <>
                         <h2 className="text-2xl font-bold text-center text-themecolor">Alle Aufgaben abgeschlossen!</h2>
                         <div className="flex justify-center mb-6">
@@ -281,6 +508,12 @@ export default function TrainPage() {
                                         <span>O: {stats.notDone}</span>
                                     </div>
                                 </div>
+                                {mode === "practice" && (
+                                    <div className="mt-4 text-center">
+                                        <p className="text-lg font-semibold">Note: {(5 / tasks.length) * stats.correct + 1}</p>
+                                        <p className="text-lg font-semibold">Prozent: {((stats.correct / tasks.length) * 100).toFixed(2)}%</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="flex justify-center gap-4 mt-8">
@@ -291,24 +524,6 @@ export default function TrainPage() {
                                 className="px-6 py-3 bg-themecolor text-white font-semibold rounded-lg shadow-md hover:bg-themecolorhover"
                             >
                                 Zurück zur Auswahl
-                            </motion.button>
-                        </div>
-                    </>
-                )}
-
-                {/* Practice Test Placeholder */}
-                {mode === "practice" && (
-                    <>
-                        <h2 className="text-2xl font-bold text-center text-themecolor">Praxistest</h2>
-                        <p className="text-center text-gray-500 mt-2">Der Praxistest ist noch in Entwicklung. Bitte kehre zum Training zurück oder überprüfe später erneut.</p>
-                        <div className="flex justify-center mt-8">
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => setMode("initial")}
-                                className="px-6 py-3 bg-themecolor text-white font-semibold rounded-lg shadow-md hover:bg-themecolorhover"
-                            >
-                                Zurück
                             </motion.button>
                         </div>
                     </>

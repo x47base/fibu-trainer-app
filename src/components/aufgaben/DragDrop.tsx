@@ -7,10 +7,11 @@ import { PieChart, Pie, Cell, Tooltip } from "recharts";
 interface DragDropProps {
     task: any;
     stats: { correct: number; incorrect: number; notDone: number };
-    onResult: (isCorrect: boolean) => void;
+    onResult: (isCorrect: boolean, wrongValue?: any) => void;
     onNext: () => void;
     onSkip: () => void;
     onBack: () => void;
+    mode: "training" | "practice";
 }
 
 interface DraggableItemProps {
@@ -71,22 +72,26 @@ const DropZone: React.FC<DropZoneProps> = ({ side, items, onDrop }) => {
     );
 };
 
-export default function DragDrop({ task, stats, onResult, onNext, onSkip, onBack }: DragDropProps) {
+export default function DragDrop({ task, stats, onResult, onNext, onSkip, onBack, mode }: DragDropProps) {
     const [sollItems, setSollItems] = useState<string[]>([]);
     const [habenItems, setHabenItems] = useState<string[]>([]);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+    const [hasChecked, setHasChecked] = useState(false);
+    const [availableItems, setAvailableItems] = useState<string[]>([]);
 
     useEffect(() => {
-        setSollItems([]);
-        setHabenItems([]);
-        setIsCorrect(null);
+        if (task) {
+            setSollItems([]);
+            setHabenItems([]);
+            setIsCorrect(null);
+            setHasChecked(false);
+            setAvailableItems([...(task.content.soll || []), ...(task.content.haben || [])]);
+        }
     }, [task]);
 
     if (!task) {
         return <div>Lade Aufgabe...</div>;
     }
-
-    const availableItems = [...(task.content.soll || []), ...(task.content.haben || [])];
 
     const handleDrop = (item: { value: string; type: string }, side: "soll" | "haben") => {
         if (side === "soll") {
@@ -99,7 +104,8 @@ export default function DragDrop({ task, stats, onResult, onNext, onSkip, onBack
     const handleValidate = async () => {
         const isValid = await Validate(task, sollItems, habenItems);
         setIsCorrect(isValid);
-        onResult(isValid);
+        setHasChecked(true);
+        onResult(isValid, isValid ? undefined : { soll: sollItems, haben: habenItems });
     };
 
     const chartData = [
@@ -115,7 +121,10 @@ export default function DragDrop({ task, stats, onResult, onNext, onSkip, onBack
                     {/* Task Content */}
                     <div className="flex-1">
                         <h2 className="text-3xl font-bold mb-6 text-center md:text-left">Kontenkreuz Aufgabe</h2>
-                        <p className="mb-4 text-center md:text-left">Ziehe die Beträge in die richtige Seite des Kontenkreuzes für {task.content.account}:</p>
+                        <p className="mb-4 text-center md:text-left">{task.content.scenario}</p>
+                        <p className="mb-4 text-center md:text-left">
+                            Ziehe die Beträge in die richtige Seite des Kontenkreuzes für {task.content.account}:
+                        </p>
                         <div className="flex w-full max-w-lg border-b-2 border-themecolor mx-auto md:mx-0">
                             <DropZone side="soll" items={sollItems} onDrop={(item) => handleDrop(item, "soll")} />
                             <DropZone side="haben" items={habenItems} onDrop={(item) => handleDrop(item, "haben")} />
@@ -124,7 +133,7 @@ export default function DragDrop({ task, stats, onResult, onNext, onSkip, onBack
                             <h3 className="font-semibold mb-2 text-center md:text-left">Verfügbare Beträge:</h3>
                             <div className="flex gap-4 flex-wrap justify-center md:justify-start">
                                 {availableItems.map((value, index) => (
-                                    <DraggableItem key={index} value={value} type="amount" />
+                                    <DraggableItem key={`${value}-${index}`} value={value} type="amount" />
                                 ))}
                             </div>
                         </div>
@@ -177,22 +186,27 @@ export default function DragDrop({ task, stats, onResult, onNext, onSkip, onBack
                     >
                         Zurück
                     </motion.button>
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={onSkip}
-                        className="px-3 py-2 bg-gray-300 text-gray-700 text-sm font-semibold rounded-lg shadow-md hover:bg-gray-400"
-                    >
-                        Überspringen
-                    </motion.button>
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={handleValidate}
-                        className="px-3 py-2 bg-themecolor text-white text-sm font-semibold rounded-lg shadow-md hover:bg-themecolorhover"
-                    >
-                        Prüfen
-                    </motion.button>
+                    {mode === "training" && !hasChecked && (
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={onSkip}
+                            className="px-3 py-2 bg-gray-300 text-gray-700 text-sm font-semibold rounded-lg shadow-md hover:bg-gray-400"
+                        >
+                            Überspringen
+                        </motion.button>
+                    )}
+                    {(mode === "practice" || (mode === "training" && !isCorrect)) && (
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={handleValidate}
+                            className="px-3 py-2 bg-themecolor text-white text-sm font-semibold rounded-lg shadow-md hover:bg-themecolorhover"
+                            disabled={mode === "practice" && hasChecked}
+                        >
+                            Prüfen
+                        </motion.button>
+                    )}
                     {isCorrect && (
                         <motion.button
                             whileHover={{ scale: 1.05 }}

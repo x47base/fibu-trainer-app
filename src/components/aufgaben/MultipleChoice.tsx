@@ -5,19 +5,22 @@ import { PieChart, Pie, Cell, Tooltip } from "recharts";
 interface MultipleChoiceProps {
     task: any;
     stats: { correct: number; incorrect: number; notDone: number };
-    onResult: (isCorrect: boolean) => void;
+    onResult: (isCorrect: boolean, wrongValue?: any) => void;
     onNext: () => void;
     onSkip: () => void;
     onBack: () => void;
+    mode: "training" | "practice";
 }
 
-export default function MultipleChoice({ task, stats, onResult, onNext, onSkip, onBack }: MultipleChoiceProps) {
+export default function MultipleChoice({ task, stats, onResult, onNext, onSkip, onBack, mode }: MultipleChoiceProps) {
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+    const [hasChecked, setHasChecked] = useState(false);
 
     useEffect(() => {
         setSelectedAnswer(null);
         setIsCorrect(null);
+        setHasChecked(false);
     }, [task]);
 
     if (!task) {
@@ -29,7 +32,8 @@ export default function MultipleChoice({ task, stats, onResult, onNext, onSkip, 
         const selectedIndex = String(task.content.options.indexOf(selectedAnswer));
         const isValid = selectedIndex === correctAnswerIndex;
         setIsCorrect(isValid);
-        onResult(isValid);
+        setHasChecked(true);
+        onResult(isValid, isValid ? undefined : selectedAnswer);
     }
 
     const chartData = [
@@ -109,23 +113,27 @@ export default function MultipleChoice({ task, stats, onResult, onNext, onSkip, 
                 >
                     Zurück
                 </motion.button>
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={onSkip}
-                    className="px-3 py-2 bg-gray-300 text-gray-700 text-sm font-semibold rounded-lg shadow-md hover:bg-gray-400"
-                >
-                    Überspringen
-                </motion.button>
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={validateAnswer}
-                    className="px-3 py-2 bg-themecolor text-white text-sm font-semibold rounded-lg shadow-md hover:bg-themecolorhover disabled:bg-gray-400"
-                    disabled={!selectedAnswer}
-                >
-                    Prüfen
-                </motion.button>
+                {mode === "training" && !hasChecked && (
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={onSkip}
+                        className="px-3 py-2 bg-gray-300 text-gray-700 text-sm font-semibold rounded-lg shadow-md hover:bg-gray-400"
+                    >
+                        Überspringen
+                    </motion.button>
+                )}
+                {(mode === "practice" || (mode === "training" && !isCorrect)) && (
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={validateAnswer}
+                        className="px-3 py-2 bg-themecolor text-white text-sm font-semibold rounded-lg shadow-md hover:bg-themecolorhover disabled:bg-gray-400"
+                        disabled={!selectedAnswer || (mode === "practice" && hasChecked)}
+                    >
+                        Prüfen
+                    </motion.button>
+                )}
                 {isCorrect && (
                     <motion.button
                         whileHover={{ scale: 1.05 }}

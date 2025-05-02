@@ -66,6 +66,8 @@ export default {
                 token.name = user.name;
                 token.image = user.image;
                 token.admin = user.admin ?? false;
+                token.role = user.admin ? "admin" : "user";
+                token.exams = user.exams ?? [];
             }
             return token;
         },
@@ -76,6 +78,8 @@ export default {
                     name: token.name ?? "User",
                     image: token.image ?? null,
                     admin: token.admin ?? false,
+                    role: token.role ?? "user",
+                    exams: token.exams ?? [],
                 };
                 session.status = "authenticated";
             } else {
