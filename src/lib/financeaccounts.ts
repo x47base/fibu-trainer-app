@@ -1,5 +1,3 @@
-import { Alice } from "next/font/google";
-
 const ACCOUNTS = [
     // 1-Aktiven: Umlaufvermögen (10)
     { name: "Kasse", aliases: ["Ka"] },

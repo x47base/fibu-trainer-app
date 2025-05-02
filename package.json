@@ -6,12 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "import:data": "cross-env NODE_OPTIONS='' ts-node --esm scripts/importData.ts",
+    "import:data:compiled": "tsc scripts/importData.ts --outDir dist --target ES2017 --module commonjs && node dist/importData.js"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.7.4",
     "bcrypt": "^5.1.1",
     "clsx": "^2.1.1",
+    "dotenv": "^16.5.0",
     "framer-motion": "^12.4.7",
     "mongodb": "^6.14.0",
     "next": "^15.3.1",
@@ -28,13 +31,15 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@types/node": "^20",
+    "@types/node": "^20.17.32",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^7.0.3",
     "eslint": "^9",
     "eslint-config-next": "15.1.7",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   }
 }

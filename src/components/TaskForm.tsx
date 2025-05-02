@@ -306,7 +306,7 @@ export default function TaskForm() {
             {task.type === "text" && (
                 <>
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Text (z.B. "Die {0} erhöhen das {1}.")</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Text (z.B. {'"'}Die {0} erhöhen das {1}.{'"'})</label>
                         <textarea
                             value={task.content.text || ""}
                             onChange={(e) => setTask({ ...task, content: { ...task.content, text: limitTo10Lines(e.target.value) } })}
@@ -315,7 +315,7 @@ export default function TaskForm() {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Antworten (getrennt durch ";")</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Antworten (getrennt durch {'"'};{'"'})</label>
                         <input
                             type="text"
                             value={task.content.answers?.join("; ") || ""}
