@@ -24,7 +24,7 @@ export default function TrainPage() {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [examResults, setExamResults] = useState<any[]>([]);
     const [availableTags, setAvailableTags] = useState<string[]>([]);
-    const [taskAttempts, setTaskAttempts] = useState<Set<string>>(new Set()); // Track attempted task IDs
+    const [taskAttempts, setTaskAttempts] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         if (status === "loading") return;
@@ -71,7 +71,7 @@ export default function TrainPage() {
             setShowTask(true);
             setError(null);
             setExamResults([]);
-            setTaskAttempts(new Set()); // Reset attempts for new task set
+            setTaskAttempts(new Set());
         } catch (error) {
             console.error("Error fetching tasks:", error);
             setError("Fehler beim Laden der Aufgaben.");
@@ -139,7 +139,7 @@ export default function TrainPage() {
             setShowTask(true);
             setError(null);
             setExamResults([]);
-            setTaskAttempts(new Set()); // Reset attempts for new task set
+            setTaskAttempts(new Set());
         } catch (error) {
             console.error("Error fetching practice tasks:", error);
             setError(`Fehler beim Laden der Aufgaben: ${error.message}`);
@@ -215,7 +215,7 @@ export default function TrainPage() {
             setSelectedTaskType(null);
             setTasks([]);
             setError(null);
-            setTaskAttempts(new Set()); // Reset attempts when going back
+            setTaskAttempts(new Set());
         } else if (mode === "practiceSelect") {
             setMode("initial");
             setSelectedTags([]);
