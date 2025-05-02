@@ -10,9 +10,10 @@ interface TextsProps {
     onSkip: () => void;
     onBack: () => void;
     mode: "training" | "practice";
+    resultProcessed: boolean;
 }
 
-export default function Texts({ task, stats, onResult, onNext, onSkip, onBack, mode }: TextsProps) {
+export default function Texts({ task, stats, onResult, onNext, onSkip, onBack, mode, resultProcessed }: TextsProps) {
     const [inputValue, setInputValue] = useState("");
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [hasChecked, setHasChecked] = useState(false);
@@ -33,6 +34,8 @@ export default function Texts({ task, stats, onResult, onNext, onSkip, onBack, m
         setHasChecked(true);
         onResult(isValid, isValid ? undefined : inputValue);
     };
+
+    const canProceed = mode === "practice" ? (hasChecked || resultProcessed) : isCorrect;
 
     const chartData = [
         { name: "Richtig", value: stats.correct, color: "#22C55E" },
@@ -59,6 +62,7 @@ export default function Texts({ task, stats, onResult, onNext, onSkip, onBack, m
                             required
                             className="w-48 px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-themecolorhover focus:border-themecolor transition-colors duration-200"
                             placeholder="Antwort eingeben"
+                            disabled={hasChecked && mode === "practice"}
                         />
                     </div>
                 </div>
@@ -100,6 +104,13 @@ export default function Texts({ task, stats, onResult, onNext, onSkip, onBack, m
                 </div>
             </div>
 
+            {/* Feedback */}
+            {isCorrect !== null && (
+                <div className={`mt-4 px-4 py-2 rounded-lg text-white text-center ${isCorrect ? "bg-green-500" : "bg-red-500"}`}>
+                    {isCorrect ? "Richtige Antwort!" : `Falsche Antwort. Korrekte Antworten: ${task.content.answers.join(", ")}`}
+                </div>
+            )}
+
             {/* Buttons */}
             <div className="flex gap-3 mt-6 flex-wrap justify-center">
                 <motion.button
@@ -110,7 +121,7 @@ export default function Texts({ task, stats, onResult, onNext, onSkip, onBack, m
                 >
                     Zurück
                 </motion.button>
-                {mode === "training" && !hasChecked && (
+                {mode === "practice" && !hasChecked && (
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -120,35 +131,28 @@ export default function Texts({ task, stats, onResult, onNext, onSkip, onBack, m
                         Überspringen
                     </motion.button>
                 )}
-                {(mode === "practice" || (mode === "training" && !isCorrect)) && (
+                {!hasChecked && (
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={handleValidate}
                         className="px-3 py-2 bg-themecolor text-white text-sm font-semibold rounded-lg shadow-md hover:bg-themecolorhover"
-                        disabled={mode === "practice" && hasChecked}
+                        disabled={!inputValue.trim()}
                     >
                         Prüfen
                     </motion.button>
                 )}
-                {isCorrect && (
+                {canProceed && (
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={onNext}
                         className="px-3 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-blue-700"
                     >
-                        Nächste Aufgabe
+                        {mode === "practice" && !isCorrect ? "Weiter" : "Nächste Aufgabe"}
                     </motion.button>
                 )}
             </div>
-
-            {/* Feedback */}
-            {isCorrect !== null && (
-                <div className={`mt-4 px-4 py-2 rounded-lg text-white text-center ${isCorrect ? "bg-green-500" : "bg-red-500"}`}>
-                    {isCorrect ? "Richtige Antwort!" : "Falsche Antwort. Bitte überprüfen."}
-                </div>
-            )}
         </div>
     );
 }

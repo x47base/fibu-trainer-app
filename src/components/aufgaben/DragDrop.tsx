@@ -12,6 +12,7 @@ interface DragDropProps {
     onSkip: () => void;
     onBack: () => void;
     mode: "training" | "practice";
+    resultProcessed: boolean;
 }
 
 interface DraggableItemProps {
@@ -44,21 +45,23 @@ interface DropZoneProps {
     side: "soll" | "haben";
     items: string[];
     onDrop: (item: { value: string; type: string }) => void;
+    disabled: boolean;
 }
 
-const DropZone: React.FC<DropZoneProps> = ({ side, items, onDrop }) => {
+const DropZone: React.FC<DropZoneProps> = ({ side, items, onDrop, disabled }) => {
     const [{ isOver }, drop] = useDrop(() => ({
         accept: ItemType,
         drop: (item: { value: string; type: string }) => onDrop(item),
         collect: (monitor) => ({
             isOver: !!monitor.isOver(),
         }),
+        canDrop: () => !disabled,
     }));
 
     return (
         <div
             ref={drop}
-            className={`w-1/2 p-4 border ${side === "soll" ? "border-l-2 border-t-2" : "border-r-2 border-t-2"} ${isOver ? "bg-themecolor/10" : ""}`}
+            className={`w-1/2 p-4 border ${side === "soll" ? "border-l-2 border-t-2" : "border-r-2 border-t-2"} ${isOver && !disabled ? "bg-themecolor/10" : ""}`}
         >
             <h3 className="font-semibold text-center">{side === "soll" ? "Soll" : "Haben"}</h3>
             <div className="mt-2 flex flex-col gap-2">
@@ -72,7 +75,7 @@ const DropZone: React.FC<DropZoneProps> = ({ side, items, onDrop }) => {
     );
 };
 
-export default function DragDrop({ task, stats, onResult, onNext, onSkip, onBack, mode }: DragDropProps) {
+export default function DragDrop({ task, stats, onResult, onNext, onSkip, onBack, mode, resultProcessed }: DragDropProps) {
     const [sollItems, setSollItems] = useState<string[]>([]);
     const [habenItems, setHabenItems] = useState<string[]>([]);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
@@ -99,6 +102,7 @@ export default function DragDrop({ task, stats, onResult, onNext, onSkip, onBack
         } else {
             setHabenItems((prev) => [...prev, item.value]);
         }
+        setAvailableItems((prev) => prev.filter((v) => v !== item.value));
     };
 
     const handleValidate = async () => {
@@ -107,6 +111,8 @@ export default function DragDrop({ task, stats, onResult, onNext, onSkip, onBack
         setHasChecked(true);
         onResult(isValid, isValid ? undefined : { soll: sollItems, haben: habenItems });
     };
+
+    const canProceed = mode === "practice" ? (hasChecked || resultProcessed) : isCorrect;
 
     const chartData = [
         { name: "Richtig", value: stats.correct, color: "#22C55E" },
@@ -126,14 +132,28 @@ export default function DragDrop({ task, stats, onResult, onNext, onSkip, onBack
                             Ziehe die Beträge in die richtige Seite des Kontenkreuzes für {task.content.account}:
                         </p>
                         <div className="flex w-full max-w-lg border-b-2 border-themecolor mx-auto md:mx-0">
-                            <DropZone side="soll" items={sollItems} onDrop={(item) => handleDrop(item, "soll")} />
-                            <DropZone side="haben" items={habenItems} onDrop={(item) => handleDrop(item, "haben")} />
+                            <DropZone
+                                side="soll"
+                                items={sollItems}
+                                onDrop={(item) => handleDrop(item, "soll")}
+                                disabled={hasChecked && mode === "practice"}
+                            />
+                            <DropZone
+                                side="haben"
+                                items={habenItems}
+                                onDrop={(item) => handleDrop(item, "haben")}
+                                disabled={hasChecked && mode === "practice"}
+                            />
                         </div>
                         <div className="mt-6">
                             <h3 className="font-semibold mb-2 text-center md:text-left">Verfügbare Beträge:</h3>
                             <div className="flex gap-4 flex-wrap justify-center md:justify-start">
                                 {availableItems.map((value, index) => (
-                                    <DraggableItem key={`${value}-${index}`} value={value} type="amount" />
+                                    <DraggableItem
+                                        key={`${value}-${index}`}
+                                        value={value}
+                                        type="amount"
+                                    />
                                 ))}
                             </div>
                         </div>
@@ -176,6 +196,21 @@ export default function DragDrop({ task, stats, onResult, onNext, onSkip, onBack
                     </div>
                 </div>
 
+                {/* Feedback */}
+                {isCorrect !== null && (
+                    <div className={`mt-4 px-4 py-2 rounded-lg text-white text-center ${isCorrect ? "bg-green-500" : "bg-red-500"}`}>
+                        {isCorrect ? (
+                            "Richtige Buchung!"
+                        ) : (
+                            <div>
+                                Falsche Buchung. Korrekte Platzierung:
+                                <p>Soll: {task.content.soll.join(", ") || "Keine"}</p>
+                                <p>Haben: {task.content.haben.join(", ") || "Keine"}</p>
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 {/* Buttons */}
                 <div className="flex gap-3 mt-6 flex-wrap justify-center">
                     <motion.button
@@ -186,7 +221,7 @@ export default function DragDrop({ task, stats, onResult, onNext, onSkip, onBack
                     >
                         Zurück
                     </motion.button>
-                    {mode === "training" && !hasChecked && (
+                    {mode === "practice" && !hasChecked && (
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -196,35 +231,27 @@ export default function DragDrop({ task, stats, onResult, onNext, onSkip, onBack
                             Überspringen
                         </motion.button>
                     )}
-                    {(mode === "practice" || (mode === "training" && !isCorrect)) && (
+                    {!hasChecked && (
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={handleValidate}
                             className="px-3 py-2 bg-themecolor text-white text-sm font-semibold rounded-lg shadow-md hover:bg-themecolorhover"
-                            disabled={mode === "practice" && hasChecked}
                         >
                             Prüfen
                         </motion.button>
                     )}
-                    {isCorrect && (
+                    {canProceed && (
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={onNext}
                             className="px-3 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-blue-700"
                         >
-                            Nächste Aufgabe
+                            {mode === "practice" && !isCorrect ? "Weiter" : "Nächste Aufgabe"}
                         </motion.button>
                     )}
                 </div>
-
-                {/* Feedback */}
-                {isCorrect !== null && (
-                    <div className={`mt-4 px-4 py-2 rounded-lg text-white text-center ${isCorrect ? "bg-green-500" : "bg-red-500"}`}>
-                        {isCorrect ? "Richtige Buchung!" : "Falsche Buchung. Bitte überprüfen."}
-                    </div>
-                )}
             </div>
         </DndProvider>
     );

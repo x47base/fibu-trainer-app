@@ -11,9 +11,10 @@ interface BuchungProps {
     onSkip: () => void;
     onBack: () => void;
     mode: "training" | "practice";
+    resultProcessed: boolean;
 }
 
-export default function Buchung({ task, stats, onResult, onNext, onSkip, onBack, mode }: BuchungProps) {
+export default function Buchung({ task, stats, onResult, onNext, onSkip, onBack, mode, resultProcessed }: BuchungProps) {
     const [inputs, setInputs] = useState<any[]>([]);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [hasChecked, setHasChecked] = useState(false);
@@ -43,6 +44,8 @@ export default function Buchung({ task, stats, onResult, onNext, onSkip, onBack,
         onResult(isValid, isValid ? undefined : inputs);
     };
 
+    const canProceed = mode === "practice" ? (hasChecked || resultProcessed) : isCorrect;
+
     const chartData = [
         { name: "Richtig", value: stats.correct, color: "#22C55E" },
         { name: "Falsch", value: stats.incorrect, color: "#EF4444" },
@@ -56,19 +59,21 @@ export default function Buchung({ task, stats, onResult, onNext, onSkip, onBack,
                 <div className="flex-1">
                     <h2 className="text-3xl font-semibold mb-6 text-center md:text-left">Buchungsaufgabe</h2>
                     <span className="block mb-6 text-center md:text-left">{task.content.scenario}</span>
-                    {task.content.bookings.map((_, index: number) => (
+                    {task.content.bookings.map((_: any, index: number) => (
                         <div key={index} className="flex items-center gap-4 mb-4">
                             <AccountInput
                                 field="soll"
                                 value={inputs[index]?.soll || ""}
                                 onChange={(value) => handleInputChange(index, "soll", value)}
                                 className="w-48 px-4 py-2 border rounded-lg"
+                                disabled={hasChecked && mode === "practice"}
                             />
                             <AccountInput
                                 field="haben"
                                 value={inputs[index]?.haben || ""}
                                 onChange={(value) => handleInputChange(index, "haben", value)}
                                 className="w-48 px-4 py-2 border rounded-lg"
+                                disabled={hasChecked && mode === "practice"}
                             />
                             <input
                                 type="number"
@@ -76,6 +81,7 @@ export default function Buchung({ task, stats, onResult, onNext, onSkip, onBack,
                                 value={inputs[index]?.betrag || ""}
                                 onChange={(e) => handleInputChange(index, "betrag", e.target.value)}
                                 className="w-48 px-4 py-2 border rounded-lg"
+                                disabled={hasChecked && mode === "practice"}
                             />
                         </div>
                     ))}
@@ -118,6 +124,26 @@ export default function Buchung({ task, stats, onResult, onNext, onSkip, onBack,
                 </div>
             </div>
 
+            {/* Feedback */}
+            {isCorrect !== null && (
+                <div className={`mt-4 px-4 py-2 rounded-lg text-white text-center ${isCorrect ? "bg-green-500" : "bg-red-500"}`}>
+                    {isCorrect ? (
+                        "Richtige Buchung!"
+                    ) : (
+                        <div>
+                            Falsche Buchung. Korrekte Buchungen:
+                            <ul className="mt-2">
+                                {task.content.bookings.map((booking: any, index: number) => (
+                                    <li key={index}>
+                                        Soll: {booking.soll}, Haben: {booking.haben}, Betrag: {booking.betrag}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+            )}
+
             {/* Buttons */}
             <div className="flex gap-3 mt-6 flex-wrap justify-center">
                 <motion.button
@@ -128,7 +154,7 @@ export default function Buchung({ task, stats, onResult, onNext, onSkip, onBack,
                 >
                     Zurück
                 </motion.button>
-                {mode === "training" && !hasChecked && (
+                {mode === "practice" && !hasChecked && (
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -138,35 +164,27 @@ export default function Buchung({ task, stats, onResult, onNext, onSkip, onBack,
                         Überspringen
                     </motion.button>
                 )}
-                {(mode === "practice" || (mode === "training" && !isCorrect)) && (
+                {!hasChecked && (
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={handleValidate}
                         className="px-3 py-2 bg-themecolor text-white text-sm font-semibold rounded-lg shadow-md hover:bg-themecolorhover"
-                        disabled={mode === "practice" && hasChecked}
                     >
                         Prüfen
                     </motion.button>
                 )}
-                {isCorrect && (
+                {canProceed && (
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={onNext}
                         className="px-3 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-blue-700"
                     >
-                        Nächste Aufgabe
+                        {mode === "practice" && !isCorrect ? "Weiter" : "Nächste Aufgabe"}
                     </motion.button>
                 )}
             </div>
-
-            {/* Feedback */}
-            {isCorrect !== null && (
-                <div className={`mt-4 px-4 py-2 rounded-lg text-white text-center ${isCorrect ? "bg-green-500" : "bg-red-500"}`}>
-                    {isCorrect ? "Richtige Buchung!" : "Falsche Buchung. Bitte überprüfen."}
-                </div>
-            )}
         </div>
     );
 }

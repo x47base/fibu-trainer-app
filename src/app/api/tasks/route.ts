@@ -19,24 +19,34 @@ export async function GET(request: Request) {
 
     try {
         const { searchParams } = new URL(request.url);
-        let taskType = searchParams.get("type");
+        const taskType = searchParams.get("type");
+        const taskTypes = searchParams.get("types");
         const tags = searchParams.get("tags");
         const getTags = searchParams.get("tags") === "true";
 
-        if (taskType) {
-            taskType = TASK_TYPE_MAP[taskType.toLowerCase()] || taskType;
+        let types: string[] | undefined;
+        if (taskTypes) {
+            types = taskTypes.split(",").map((t) => {
+                const type = t.trim().toLowerCase();
+                return TASK_TYPE_MAP[type] || type;
+            });
+            const invalidTypes = types.filter((t) => !VALID_TASK_TYPES.includes(t));
+            if (invalidTypes.length > 0) {
+                return NextResponse.json(
+                    { message: `Invalid task types: ${invalidTypes.join(", ")}. Must be one of: ${VALID_TASK_TYPES.join(", ")}` },
+                    { status: 400 }
+                );
+            }
+        } else if (taskType) {
+            const mappedType = TASK_TYPE_MAP[taskType.toLowerCase()] || taskType;
+            if (!VALID_TASK_TYPES.includes(mappedType)) {
+                return NextResponse.json(
+                    { message: `Invalid task type: ${mappedType}. Must be one of: ${VALID_TASK_TYPES.join(", ")}` },
+                    { status: 400 }
+                );
+            }
+            types = [mappedType];
         }
-
-        if (taskType && !VALID_TASK_TYPES.includes(taskType)) {
-            return NextResponse.json(
-                { message: `Invalid task type. Must be one of: ${VALID_TASK_TYPES.join(", ")}` },
-                { status: 400 }
-            );
-        }
-
-        const client = await clientPromise;
-        const db = client.db();
-        const query: any = {};
 
         if (getTags) {
             const client = await clientPromise;
@@ -44,13 +54,21 @@ export async function GET(request: Request) {
             const tasks = await db.collection("tasks").find({}).toArray();
             const allTags = new Set<string>();
             tasks.forEach((task: any) => {
-                task.tags.forEach((tag: string) => allTags.add(tag));
+                task.tags?.forEach((tag: string) => allTags.add(tag));
             });
             return NextResponse.json(Array.from(allTags), { status: 200 });
         }
 
-        if (taskType) {
-            query.type = taskType;
+        const client = await clientPromise;
+        const db = client.db();
+        const query: any = {};
+
+        if (types && types.length > 0) {
+            query.type = { $in: types };
+        }
+        if (tags) {
+            const tagArray = tags.split(",").map((tag) => tag.trim());
+            query.tags = { $all: tagArray };
         }
 
         const tasks = await db

@@ -10,6 +10,14 @@ import Buchung from "@/components/aufgaben/Buchung";
 import MultipleChoice from "@/components/aufgaben/MultipleChoice";
 import DragDrop from "@/components/aufgaben/DragDrop";
 import Texts from "@/components/aufgaben/Texts";
+import BadgePopup from "@/components/BadgePopup";
+
+interface Badge {
+    id: string;
+    name: string;
+    description: string;
+    awardedAt: string;
+}
 
 export default function TrainPage() {
     const { data: session, status } = useSession();
@@ -22,9 +30,13 @@ export default function TrainPage() {
     const [showTask, setShowTask] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [selectedTaskTypes, setSelectedTaskTypes] = useState<string[]>([]);
     const [examResults, setExamResults] = useState<any[]>([]);
     const [availableTags, setAvailableTags] = useState<string[]>([]);
     const [taskAttempts, setTaskAttempts] = useState<Set<string>>(new Set());
+    const [newBadges, setNewBadges] = useState<Badge[]>([]);
+    const [taskResultProcessed, setTaskResultProcessed] = useState(false);
+    const [isExamComplete, setIsExamComplete] = useState(false);
 
     useEffect(() => {
         if (status === "loading") return;
@@ -72,6 +84,8 @@ export default function TrainPage() {
             setError(null);
             setExamResults([]);
             setTaskAttempts(new Set());
+            setTaskResultProcessed(false);
+            setIsExamComplete(false);
         } catch (error) {
             console.error("Error fetching tasks:", error);
             setError("Fehler beim Laden der Aufgaben.");
@@ -82,9 +96,18 @@ export default function TrainPage() {
 
     const fetchPracticeTasks = async () => {
         try {
+            if (selectedTaskTypes.length === 0) {
+                setError("Bitte wähle mindestens einen Aufgabentyp aus.");
+                setTasks([]);
+                setShowTask(false);
+                return;
+            }
             const tagsQuery = selectedTags.join(",");
-            console.log("Fetching practice tasks with tags:", tagsQuery);
-            const response = await fetch(`/api/tasks?tags=${encodeURIComponent(tagsQuery)}`);
+            const typesQuery = selectedTaskTypes.map((type) => getCanonicalTaskType(type)).join(",");
+            console.log("Fetching practice tasks with tags:", tagsQuery, "and types:", typesQuery);
+            const response = await fetch(
+                `/api/tasks?tags=${encodeURIComponent(tagsQuery)}&types=${encodeURIComponent(typesQuery)}`
+            );
             if (!response.ok) {
                 throw new Error(`Failed to fetch practice tasks: ${response.status}`);
             }
@@ -92,18 +115,16 @@ export default function TrainPage() {
             console.log("Fetched practice tasks:", allTasks);
 
             if (!Array.isArray(allTasks) || allTasks.length === 0) {
-                setError("Keine Aufgaben für die ausgewählten Tags verfügbar.");
+                setError("Keine Aufgaben für die ausgewählten Tags und Aufgabentypen verfügbar.");
                 setTasks([]);
                 setShowTask(false);
                 return;
             }
 
-            const tasksByType: { [key: string]: any[] } = {
-                booking: [],
-                "multiple-choice": [],
-                text: [],
-                "drag-drop": [],
-            };
+            const tasksByType: { [key: string]: any[] } = {};
+            selectedTaskTypes.forEach((type) => {
+                tasksByType[getCanonicalTaskType(type)] = [];
+            });
             allTasks.forEach((task: any) => {
                 if (tasksByType[task.type]) {
                     tasksByType[task.type].push(task);
@@ -127,7 +148,7 @@ export default function TrainPage() {
             console.log("Final selected tasks:", finalTasks);
 
             if (finalTasks.length === 0) {
-                setError("Keine Aufgaben für die ausgewählten Tags verfügbar.");
+                setError("Keine Aufgaben für die ausgewählten Tags und Aufgabentypen verfügbar.");
                 setTasks([]);
                 setShowTask(false);
                 return;
@@ -140,6 +161,8 @@ export default function TrainPage() {
             setError(null);
             setExamResults([]);
             setTaskAttempts(new Set());
+            setTaskResultProcessed(false);
+            setIsExamComplete(false);
         } catch (error) {
             console.error("Error fetching practice tasks:", error);
             setError(`Fehler beim Laden der Aufgaben: ${error.message}`);
@@ -156,7 +179,6 @@ export default function TrainPage() {
     const handleTaskResult = (isCorrect: boolean, wrongValue?: any) => {
         const taskId = tasks[currentTaskIndex]._id;
         if (taskAttempts.has(taskId)) {
-            // Do not update stats if task was already attempted
             return;
         }
         setTaskAttempts((prev) => new Set(prev).add(taskId));
@@ -173,13 +195,15 @@ export default function TrainPage() {
                 wrongValue: isCorrect ? undefined : wrongValue,
             },
         ]);
+        setTaskResultProcessed(true);
     };
 
     const handleNextTask = () => {
+        setTaskResultProcessed(false);
         if (currentTaskIndex < tasks.length - 1) {
             setCurrentTaskIndex((prev) => prev + 1);
         } else {
-            setShowTask(false);
+            setIsExamComplete(true);
             if (mode === "practice") {
                 saveExamResults();
             }
@@ -216,9 +240,12 @@ export default function TrainPage() {
             setTasks([]);
             setError(null);
             setTaskAttempts(new Set());
+            setTaskResultProcessed(false);
+            setIsExamComplete(false);
         } else if (mode === "practiceSelect") {
             setMode("initial");
             setSelectedTags([]);
+            setSelectedTaskTypes([]);
         } else {
             setMode("initial");
         }
@@ -238,7 +265,10 @@ export default function TrainPage() {
                 percentage,
                 grade,
                 tasks: examResults,
+                tags: selectedTags,
             };
+
+            console.log("Saving exam results:", examData);
 
             const response = await fetch("/api/user/exams", {
                 method: "POST",
@@ -246,11 +276,86 @@ export default function TrainPage() {
                 body: JSON.stringify(examData),
             });
 
-            if (!response.ok) throw new Error(`Failed to save exam results: ${response.status}`);
-            console.log("Exam results saved:", examData);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Failed to save exam results: ${response.status} - ${errorData.message || "Unknown error"}`);
+            }
+            console.log("Exam results saved successfully:", examData);
+
+            await checkAndAwardBadges(percentage, pointsReceived);
         } catch (error) {
             console.error("Error saving exam results:", error);
-            setError("Fehler beim Speichern der Prüfungsergebnisse.");
+            setError(`Fehler beim Speichern der Prüfungsergebnisse: ${error.message}`);
+        }
+    };
+
+    const checkAndAwardBadges = async (percentage: number, correct: number) => {
+        try {
+            const statsResponse = await fetch("/api/user/profile");
+            if (!statsResponse.ok) throw new Error(`Failed to fetch user stats: ${statsResponse.status}`);
+            const userStats = await statsResponse.json();
+
+            const existingBadges = new Set(userStats.badges.map((b: Badge) => b.id));
+            const newBadges: Badge[] = [];
+
+            const badges = [
+                {
+                    id: "first-exam",
+                    name: "Erster Test",
+                    description: "Absolviere deinen ersten Test",
+                    condition: () => userStats.examsTaken === 0,
+                },
+                {
+                    id: "high-scorer",
+                    name: "Hochpunktzahler",
+                    description: "Erreiche 80% oder mehr in einem Test",
+                    condition: () => percentage >= 80,
+                },
+                {
+                    id: "task-master",
+                    name: "Aufgabenmeister",
+                    description: "Löse 50 Aufgaben korrekt",
+                    condition: () => userStats.totalTasksSolved + correct >= 50,
+                },
+                {
+                    id: "exam-veteran",
+                    name: "Testveteran",
+                    description: "Absolviere 5 Tests",
+                    condition: () => userStats.examsTaken + 1 >= 5,
+                },
+                {
+                    id: "perfect-score",
+                    name: "Perfekte Punktzahl",
+                    description: "Erreiche 100% in einem Test",
+                    condition: () => percentage === 100,
+                },
+            ];
+
+            for (const badge of badges) {
+                if (!existingBadges.has(badge.id) && badge.condition()) {
+                    const badgeData = {
+                        id: badge.id,
+                        name: badge.name,
+                        description: badge.description,
+                        awardedAt: new Date().toISOString(),
+                    };
+                    newBadges.push(badgeData);
+                    existingBadges.add(badge.id);
+                }
+            }
+
+            if (newBadges.length > 0) {
+                const badgeResponse = await fetch("/api/user/badges", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ badges: newBadges }),
+                });
+                if (!badgeResponse.ok) throw new Error(`Failed to award badges: ${badgeResponse.status}`);
+                setNewBadges(newBadges);
+            }
+        } catch (error) {
+            console.error("Error awarding badges:", error);
+            setError(`Fehler beim Vergleichen von Abzeichen: ${error.message}`);
         }
     };
 
@@ -260,9 +365,19 @@ export default function TrainPage() {
         );
     };
 
+    const handleTaskTypeToggle = (type: string) => {
+        setSelectedTaskTypes((prev) =>
+            prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+        );
+    };
+
     const startPracticeTest = () => {
         if (selectedTags.length === 0) {
             setError("Bitte wähle mindestens einen Tag aus.");
+            return;
+        }
+        if (selectedTaskTypes.length === 0) {
+            setError("Bitte wähle mindestens einen Aufgabentyp aus.");
             return;
         }
         setMode("practice");
@@ -282,6 +397,7 @@ export default function TrainPage() {
                         onSkip={handleSkipTask}
                         onBack={handleBack}
                         mode={mode}
+                        resultProcessed={taskResultProcessed}
                     />
                 );
             case "multiple-choice":
@@ -294,6 +410,7 @@ export default function TrainPage() {
                         onSkip={handleSkipTask}
                         onBack={handleBack}
                         mode={mode}
+                        resultProcessed={taskResultProcessed}
                     />
                 );
             case "text":
@@ -306,6 +423,7 @@ export default function TrainPage() {
                         onSkip={handleSkipTask}
                         onBack={handleBack}
                         mode={mode}
+                        resultProcessed={taskResultProcessed}
                     />
                 );
             case "drag-drop":
@@ -318,6 +436,7 @@ export default function TrainPage() {
                         onSkip={handleSkipTask}
                         onBack={handleBack}
                         mode={mode}
+                        resultProcessed={taskResultProcessed}
                     />
                 );
             default:
@@ -345,6 +464,12 @@ export default function TrainPage() {
 
     return (
         <div className="min-h-screen w-full bg-gray-100 flex flex-col items-center p-8">
+            {newBadges.length > 0 && (
+                <BadgePopup
+                    badges={newBadges}
+                    onClose={() => setNewBadges([])}
+                />
+            )}
             <main className="w-full max-w-4xl bg-white rounded-lg shadow-md p-6 mt-6">
                 {error && (
                     <div className="text-red-500 text-center mb-4">{error}</div>
@@ -384,9 +509,11 @@ export default function TrainPage() {
 
                 {mode === "practiceSelect" && (
                     <>
-                        <h2 className="text-2xl font-bold text-center text-themecolor">Praxistest Tags auswählen</h2>
-                        <p className="text-center text-gray-500 mt-2">Wähle die Tags für deinen Praxistest.</p>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-8">
+                        <h2 className="text-2xl font-bold text-center text-themecolor">Praxistest konfigurieren</h2>
+                        <p className="text-center text-gray-500 mt-2">Wähle die Tags und Aufgabentypen für deinen Praxistest.</p>
+
+                        <h3 className="text-xl font-semibold text-themecolor mt-8 mb-4">Tags auswählen</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                             {availableTags.map((tag, index) => (
                                 <motion.div
                                     key={`${tag}-${index}`}
@@ -404,6 +531,33 @@ export default function TrainPage() {
                                 </motion.div>
                             ))}
                         </div>
+
+                        <h3 className="text-xl font-semibold text-themecolor mt-8 mb-4">Aufgabentypen auswählen</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {taskTypes.map((task) => (
+                                <motion.div
+                                    key={task.id}
+                                    variants={cardVariants}
+                                    initial="initial"
+                                    animate="animate"
+                                    whileHover="hover"
+                                    whileTap="tap"
+                                    onClick={() => handleTaskTypeToggle(task.id)}
+                                    className={`relative cursor-pointer rounded-xl bg-white p-6 shadow-lg border-2 ${
+                                        selectedTaskTypes.includes(task.id) ? "border-themecolor" : "border-transparent"
+                                    }`}
+                                >
+                                    <div className="flex flex-col items-center gap-4">
+                                        <motion.div whileHover={{ rotate: 10, scale: 1.2 }} className="rounded-full bg-themecolor/10 p-3 text-themecolor">
+                                            {task.icon}
+                                        </motion.div>
+                                        <h3 className="text-xl font-semibold text-themecolor">{task.title}</h3>
+                                        <p className="text-sm text-gray-500 text-center">{task.description}</p>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+
                         <div className="flex justify-center gap-4 mt-8">
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
@@ -454,7 +608,7 @@ export default function TrainPage() {
                     </>
                 )}
 
-                {(mode === "training" || mode === "practice") && showTask && tasks.length > 0 && currentTaskIndex < tasks.length && (
+                {(mode === "training" || mode === "practice") && showTask && tasks.length > 0 && !isExamComplete && (
                     <>
                         <h2 className="text-2xl font-bold text-center text-themecolor mb-4">
                             Aufgabe {currentTaskIndex + 1} von {tasks.length}
@@ -463,7 +617,7 @@ export default function TrainPage() {
                     </>
                 )}
 
-                {(mode === "training" || mode === "practice") && showTask && tasks.length > 0 && currentTaskIndex >= tasks.length && (
+                {(mode === "training" || mode === "practice") && showTask && tasks.length > 0 && isExamComplete && (
                     <>
                         <h2 className="text-2xl font-bold text-center text-themecolor">Alle Aufgaben abgeschlossen!</h2>
                         <div className="flex justify-center mb-6">

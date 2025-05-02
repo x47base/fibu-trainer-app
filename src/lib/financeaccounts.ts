@@ -1,3 +1,5 @@
+import { Alice } from "next/font/google";
+
 const ACCOUNTS = [
     // 1-Aktiven: Umlaufvermögen (10)
     { name: "Kasse", aliases: ["Ka"] },
@@ -59,6 +61,7 @@ const ACCOUNTS = [
     { name: "Ausserordentlicher Aufwand", aliases: ["A.o. Aufwand", "A.o. A."] },
     { name: "Fahrzeugaufwand", aliases: ["FzA", "FahrzeugA"] },
     { name: "Sozialversicherungsaufwand", aliases: ["Soz. VersA", "Soz. Vers. Aufwand"] },
+    { name: "Lohnaufwand", aliases: ["LohnA", "Lohnaufw."] },
     { name: "Übriger Personalaufwand", aliases: ["Übr. Personalaufwand", "Übr. PersA"] },
     { name: "Raumaufwand", aliases: ["RaumA"] },
     { name: "Reparaturen", aliases: [] },

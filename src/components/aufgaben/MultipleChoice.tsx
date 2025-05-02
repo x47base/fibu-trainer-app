@@ -10,9 +10,10 @@ interface MultipleChoiceProps {
     onSkip: () => void;
     onBack: () => void;
     mode: "training" | "practice";
+    resultProcessed: boolean;
 }
 
-export default function MultipleChoice({ task, stats, onResult, onNext, onSkip, onBack, mode }: MultipleChoiceProps) {
+export default function MultipleChoice({ task, stats, onResult, onNext, onSkip, onBack, mode, resultProcessed }: MultipleChoiceProps) {
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [hasChecked, setHasChecked] = useState(false);
@@ -36,6 +37,8 @@ export default function MultipleChoice({ task, stats, onResult, onNext, onSkip, 
         onResult(isValid, isValid ? undefined : selectedAnswer);
     }
 
+    const canProceed = mode === "practice" ? (hasChecked || resultProcessed) : isCorrect;
+
     const chartData = [
         { name: "Richtig", value: stats.correct, color: "#22C55E" },
         { name: "Falsch", value: stats.incorrect, color: "#EF4444" },
@@ -51,7 +54,10 @@ export default function MultipleChoice({ task, stats, onResult, onNext, onSkip, 
                     <span className="block mb-6 text-center md:text-left">{task.content.question}</span>
                     <div className="flex flex-col gap-4">
                         {task.content.options.map((option: string, index: number) => (
-                            <label key={index} className="flex items-center gap-3 bg-gray-100 p-3 rounded-lg cursor-pointer hover:bg-gray-200 transition">
+                            <label
+                                key={index}
+                                className={`flex items-center gap-3 bg-gray-100 p-3 rounded-lg cursor-pointer hover:bg-gray-200 transition ${hasChecked && index === parseInt(task.content.correctAnswer) ? "bg-green-100" : ""} ${hasChecked && selectedAnswer === option && !isCorrect ? "bg-red-100" : ""}`}
+                            >
                                 <input
                                     type="radio"
                                     name="buchung"
@@ -59,6 +65,7 @@ export default function MultipleChoice({ task, stats, onResult, onNext, onSkip, 
                                     checked={selectedAnswer === option}
                                     onChange={() => setSelectedAnswer(option)}
                                     className="cursor-pointer"
+                                    disabled={hasChecked && mode === "practice"}
                                 />
                                 {option}
                             </label>
@@ -103,6 +110,13 @@ export default function MultipleChoice({ task, stats, onResult, onNext, onSkip, 
                 </div>
             </div>
 
+            {/* Feedback */}
+            {isCorrect !== null && (
+                <div className={`mt-4 px-4 py-2 rounded-lg text-white text-center ${isCorrect ? "bg-green-500" : "bg-red-500"}`}>
+                    {isCorrect ? "Richtig!" : `Falsch! Die richtige Antwort ist: ${task.content.options[task.content.correctAnswer]}`}
+                </div>
+            )}
+
             {/* Buttons */}
             <div className="flex gap-3 mt-6 flex-wrap justify-center">
                 <motion.button
@@ -113,7 +127,7 @@ export default function MultipleChoice({ task, stats, onResult, onNext, onSkip, 
                 >
                     Zurück
                 </motion.button>
-                {mode === "training" && !hasChecked && (
+                {mode === "practice" && !hasChecked && (
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -123,35 +137,28 @@ export default function MultipleChoice({ task, stats, onResult, onNext, onSkip, 
                         Überspringen
                     </motion.button>
                 )}
-                {(mode === "practice" || (mode === "training" && !isCorrect)) && (
+                {!hasChecked && (
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={validateAnswer}
                         className="px-3 py-2 bg-themecolor text-white text-sm font-semibold rounded-lg shadow-md hover:bg-themecolorhover disabled:bg-gray-400"
-                        disabled={!selectedAnswer || (mode === "practice" && hasChecked)}
+                        disabled={!selectedAnswer}
                     >
                         Prüfen
                     </motion.button>
                 )}
-                {isCorrect && (
+                {canProceed && (
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={onNext}
                         className="px-3 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-blue-700"
                     >
-                        Nächste Aufgabe
+                        {mode === "practice" && !isCorrect ? "Weiter" : "Nächste Aufgabe"}
                     </motion.button>
                 )}
             </div>
-
-            {/* Feedback */}
-            {isCorrect !== null && (
-                <div className={`mt-4 px-4 py-2 rounded-lg text-white text-center ${isCorrect ? "bg-green-500" : "bg-red-500"}`}>
-                    {isCorrect ? "Richtig!" : "Falsch! Versuche es erneut."}
-                </div>
-            )}
         </div>
     );
 }

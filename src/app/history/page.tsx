@@ -6,99 +6,69 @@ import { FaCalendarAlt, FaCheckCircle, FaTimesCircle, FaArrowLeft } from "react-
 import { motion } from "framer-motion";
 
 interface TaskHistoryEntry {
-    taskId: number;
-    correct: boolean;
-    completedAt: Date;
+    taskId: string;
+    isCorrect: boolean;
+    wrongValue?: any;
 }
 
-interface TestEntry {
-    testThemes: string[];
-    testScore: number;
-    testDate: Date;
-    testTasks: TaskHistoryEntry[];
+interface ExamEntry {
+    date: string;
+    correct: number;
+    maxPoints: number;
+    percentage: number;
+    grade: number;
+    tasks: TaskHistoryEntry[];
+    tags: string[];
+}
+
+interface TaskDetails {
+    _id: string;
+    content: { question?: string; scenario?: string };
+    type: string;
 }
 
 export default function HistoryPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
-    const [testHistory, setTestHistory] = useState<TestEntry[]>([]);
-    const [selectedTest, setSelectedTest] = useState<TestEntry | null>(null);
+    const [examHistory, setExamHistory] = useState<ExamEntry[]>([]);
+    const [selectedExam, setSelectedExam] = useState<ExamEntry | null>(null);
+    const [taskDetails, setTaskDetails] = useState<{ [key: string]: TaskDetails }>({});
 
     useEffect(() => {
         if (status === "loading") return;
-        // @ts-expect-error: status should be a property.
         if (!session || status === "unauthenticated") {
             router.push("/signin");
         } else {
-            const sortedHistory = [...placeholderTestHistory].sort((a, b) => b.testDate.getTime() - a.testDate.getTime());
-            setTestHistory(sortedHistory);
-            // TODO: Replace with real data fetch when available
-            // const fetchTestHistory = async () => {
-            //   const userId = Number(session.user.id);
-            //   const { users } = await import("@/lib/tasks").then((m) => m.getCollections());
-            //   const user = await users.findOne({ userId });
-            //   setTestHistory(user?.testHistory || []);
-            // };
-            // fetchTestHistory();
+            fetchExamHistory();
         }
     }, [session, status, router]);
 
-    const placeholderTestHistory: TestEntry[] = [
-        {
-            testThemes: ["Grundlagen der Buchhaltung", "Bilanzierung"],
-            testScore: 60,
-            testDate: new Date("2025-02-10T10:00:00"),
-            testTasks: [
-                { taskId: 1, correct: true, completedAt: new Date("2025-02-10T10:02:00") },
-                { taskId: 2, correct: false, completedAt: new Date("2025-02-10T10:03:00") },
-                { taskId: 3, correct: true, completedAt: new Date("2025-02-10T10:04:00") },
-                { taskId: 4, correct: true, completedAt: new Date("2025-02-10T10:05:00") },
-                { taskId: 5, correct: false, completedAt: new Date("2025-02-10T10:06:00") },
-            ],
-        },
-        {
-            testThemes: ["Kostenrechnung", "Jahresabschluss"],
-            testScore: 60,
-            testDate: new Date("2025-02-18T14:30:00"),
-            testTasks: [
-                { taskId: 6, correct: true, completedAt: new Date("2025-02-18T14:32:00") },
-                { taskId: 7, correct: false, completedAt: new Date("2025-02-18T14:33:00") },
-                { taskId: 8, correct: true, completedAt: new Date("2025-02-18T14:34:00") },
-                { taskId: 9, correct: false, completedAt: new Date("2025-02-18T14:35:00") },
-                { taskId: 10, correct: true, completedAt: new Date("2025-02-18T14:36:00") },
-            ],
-        },
-        {
-            testThemes: ["Mehrwertsteuer", "Finanzbuchhaltung"],
-            testScore: 80,
-            testDate: new Date("2025-02-25T09:00:00"),
-            testTasks: [
-                { taskId: 11, correct: true, completedAt: new Date("2025-02-25T09:02:00") },
-                { taskId: 12, correct: true, completedAt: new Date("2025-02-25T09:03:00") },
-                { taskId: 13, correct: false, completedAt: new Date("2025-02-25T09:04:00") },
-                { taskId: 14, correct: true, completedAt: new Date("2025-02-25T09:05:00") },
-                { taskId: 15, correct: true, completedAt: new Date("2025-02-25T09:06:00") },
-            ],
-        },
-    ];
-
-    // Placeholder Tasks for Display
-    const placeholderTasks: { [key: number]: { question: string; type: string } } = {
-        1: { question: "Buchen Sie: Kauf von Waren für 1000CHF.", type: "booking" },
-        2: { question: "Was ist ein Aktivkonto?", type: "multiple-choice" },
-        3: { question: "Die Umsatzerlöse erhöhen das ___.", type: "text" },
-        4: { question: "Ordnen Sie die Begriffe den Bilanzpositionen zu.", type: "drag-drop" },
-        5: { question: "Buchen Sie: Zahlung einer Rechnung über 500CHF.", type: "booking" },
-        6: { question: "Buchen Sie: Materialeinkauf für 1200CHF.", type: "booking" },
-        7: { question: "Die Kostenrechnung dient der ___ Ermittlung.", type: "text" },
-        8: { question: "Was bedeutet FIFO?", type: "multiple-choice" },
-        9: { question: "Erstellen Sie eine Kostenstellenrechnung.", type: "drag-drop" },
-        10: { question: "Buchen Sie: Verkauf von Dienstleistungen für 2000CHF.", type: "booking" },
-        11: { question: "Buchen Sie: Umsatzsteuerzahlung von 600CHF.", type: "booking" },
-        12: { question: "Die Körperschaftsteuer beträgt ___ Prozent.", type: "text" },
-        13: { question: "Was ist die Vorsteuer?", type: "multiple-choice" },
-        14: { question: "Ordnen Sie Steuerarten den Bereichen zu.", type: "drag-drop" },
-        15: { question: "Buchen Sie: Warenverkauf bar 1300CHF.", type: "booking" },
+    const fetchExamHistory = async () => {
+        try {
+            const response = await fetch("/api/user/exams");
+            if (!response.ok) throw new Error(`Failed to fetch exam history: ${response.status}`);
+            const exams = await response.json();
+            const sortedExams = exams.sort((a: ExamEntry, b: ExamEntry) =>
+                new Date(b.date).getTime() - new Date(a.date).getTime()
+            );
+            setExamHistory(sortedExams);
+            const taskIds = new Set<string>();
+            exams.forEach((exam: ExamEntry) => {
+                exam.tasks.forEach((task) => taskIds.add(task.taskId));
+            });
+            if (taskIds.size > 0) {
+                const taskResponse = await fetch(`/api/tasks?ids=${Array.from(taskIds).join(",")}`);
+                if (!taskResponse.ok) throw new Error(`Failed to fetch tasks: ${taskResponse.status}`);
+                const tasks: TaskDetails[] = await taskResponse.json();
+                const taskMap = tasks.reduce((acc, task) => {
+                    acc[task._id] = task;
+                    return acc;
+                }, {} as { [key: string]: TaskDetails });
+                setTaskDetails(taskMap);
+            }
+        } catch (error) {
+            console.error("Error fetching exam history:", error);
+        }
     };
 
     if (status === "loading") {
@@ -117,17 +87,17 @@ export default function HistoryPage() {
                 <p className="mt-2 text-gray-600">Sieh dir deine bisherigen Tests und Ergebnisse an.</p>
             </motion.div>
 
-            {/* Test History Overview */}
-            {!selectedTest ? (
+            {/* Exam History Overview */}
+            {!selectedExam ? (
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
                     className="w-full max-w-2xl"
                 >
-                    {testHistory.length > 0 ? (
+                    {examHistory.length > 0 ? (
                         <div className="space-y-4">
-                            {testHistory.map((test, index) => (
+                            {examHistory.map((exam, index) => (
                                 <motion.div
                                     key={index}
                                     initial={{ opacity: 0, y: 10 }}
@@ -135,26 +105,26 @@ export default function HistoryPage() {
                                     transition={{ duration: 0.4, delay: index * 0.1 }}
                                     whileHover={{ y: -2 }}
                                     className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
-                                    onClick={() => setSelectedTest(test)}
+                                    onClick={() => setSelectedExam(exam)}
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-3">
                                             <FaCalendarAlt className="text-themecolor text-lg" />
                                             <div>
                                                 <h3 className="text-md font-medium text-gray-800">
-                                                    {test.testDate.toLocaleDateString("de-DE", {
+                                                    {new Date(exam.date).toLocaleDateString("de-DE", {
                                                         year: "numeric",
                                                         month: "long",
                                                         day: "numeric",
                                                     })}
                                                 </h3>
-                                                <p className="text-sm text-gray-500">{test.testThemes.join(", ")}</p>
+                                                <p className="text-sm text-gray-500">{exam.tags.join(", ") || "Keine Tags"}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-lg font-bold text-themecolor">{test.testScore}%</p>
+                                            <p className="text-lg font-bold text-themecolor">{exam.percentage.toFixed(0)}%</p>
                                             <p className="text-xs text-gray-500">
-                                                {test.testTasks.filter((t) => t.correct).length}/{test.testTasks.length}
+                                                {exam.correct}/{exam.maxPoints}
                                             </p>
                                         </div>
                                     </div>
@@ -183,43 +153,45 @@ export default function HistoryPage() {
                     <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                         <div className="flex items-center justify-between mb-4">
                             <button
-                                onClick={() => setSelectedTest(null)}
+                                onClick={() => setSelectedExam(null)}
                                 className="flex items-center text-themecolor hover:text-themecolorhover text-sm font-medium transition-colors"
                             >
                                 <FaArrowLeft className="mr-2" /> Zurück
                             </button>
                             <div className="text-right">
-                                <p className="text-xl font-bold text-themecolor">{selectedTest.testScore}%</p>
+                                <p className="text-xl font-bold text-themecolor">{selectedExam.percentage.toFixed(0)}%</p>
                                 <p className="text-xs text-gray-500">
-                                    {selectedTest.testTasks.filter((t) => t.correct).length}/{selectedTest.testTasks.length}
+                                    {selectedExam.correct}/{selectedExam.maxPoints}
                                 </p>
                             </div>
                         </div>
                         <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                            {selectedTest.testDate.toLocaleDateString("de-DE", {
+                            {new Date(selectedExam.date).toLocaleDateString("de-DE", {
                                 year: "numeric",
                                 month: "long",
                                 day: "numeric",
                             })}
                         </h2>
-                        <p className="text-sm text-gray-600 mb-4">{selectedTest.testThemes.join(", ")}</p>
+                        <p className="text-sm text-gray-600 mb-4">{selectedExam.tags.join(", ") || "Keine Tags"}</p>
 
                         {/* Task List */}
                         <div className="space-y-3">
-                            {selectedTest.testTasks.map((task, index) => (
+                            {selectedExam.tasks.map((task, index) => (
                                 <div
                                     key={index}
                                     className="flex items-center justify-between p-3 bg-gray-100 rounded-md"
                                 >
                                     <div>
                                         <p className="text-sm text-gray-800">
-                                            {placeholderTasks[task.taskId]?.question || `Aufgabe ${task.taskId}`}
+                                            {taskDetails[task.taskId]?.content?.question ||
+                                             taskDetails[task.taskId]?.content?.scenario ||
+                                             `Aufgabe ${task.taskId}`}
                                         </p>
                                         <p className="text-xs text-gray-500">
-                                            {placeholderTasks[task.taskId]?.type || "Unbekannt"}
+                                            {taskDetails[task.taskId]?.type || "Unbekannt"}
                                         </p>
                                     </div>
-                                    {task.correct ? (
+                                    {task.isCorrect ? (
                                         <FaCheckCircle className="text-green-500 text-lg" />
                                     ) : (
                                         <FaTimesCircle className="text-red-500 text-lg" />
