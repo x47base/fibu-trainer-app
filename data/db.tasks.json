@@ -28,7 +28,7 @@
             "scenario": "Kreditkauf einer neuen EDV-Anlage bei der SPIRA AG: CHF 9,600.00.",
             "bookings": [
                 {
-                    "soll": "Mobiliar",
+                    "soll": "Mobiliar und Einrichtungen",
                     "haben": "Verbindlichkeiten aus Lieferungen und Leistungen",
                     "betrag": 9600
                 }
@@ -56,7 +56,7 @@
                 },
                 {
                     "soll": "Verbindlichkeiten aus Lieferungen und Leistungen",
-                    "haben": "Mobiliar",
+                    "haben": "Mobiliar und Einrichtungen",
                     "betrag": 192
                 }
             ]
@@ -78,7 +78,7 @@
             "bookings": [
                 {
                     "soll": "Übriger Personalaufwand",
-                    "haben": "Mobiliar",
+                    "haben": "Mobiliar und Einrichtungen",
                     "betrag": 300
                 }
             ]
@@ -246,7 +246,7 @@
             "scenario": "Wir kaufen diverse Computer im Wert von CHF 10,300.00 inkl. 8% MWST: Nettomethode.",
             "bookings": [
                 {
-                    "soll": "Mobiliar",
+                    "soll": "Mobiliar und Einrichtungen",
                     "haben": "Verbindlichkeiten aus Lieferungen und Leistungen",
                     "betrag": 9537.05
                 },
@@ -426,7 +426,7 @@
             "bookings": [
                 {
                     "soll": "Abschreibungen",
-                    "haben": "Mobiliar",
+                    "haben": "Mobiliar und Einrichtungen",
                     "betrag": 2000
                 }
             ]
