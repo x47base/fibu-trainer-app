@@ -45,3 +45,44 @@ npm run dev
 ```  
 Open `http://localhost:3000` in your browser.
 
+
+## LICENSE
+
+This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
+
+## DEPENDENCY LICENSE(S)
+
+### Dependencies
+
+@auth/mongodb-adapter (LICENSE_NAME: ISC)
+bcrypt (LICENSE_NAME: MIT)
+clsx (LICENSE_NAME: MIT)
+dotenv (LICENSE_NAME: BSD-2-Clause)
+framer-motion (LICENSE_NAME: MIT)
+mongodb (LICENSE_NAME: Apache-2.0)
+next (LICENSE_NAME: MIT)
+next-auth (LICENSE_NAME: ISC)
+react (LICENSE_NAME: MIT)
+react-confetti (LICENSE_NAME: MIT)
+react-dnd (LICENSE_NAME: MIT)
+react-dnd-html5-backend (LICENSE_NAME: MIT)
+react-dom (LICENSE_NAME: MIT)
+react-icons (LICENSE_NAME: MIT)
+recharts (LICENSE_NAME: MIT)
+tailwind-merge (LICENSE_NAME: MIT)
+zod (LICENSE_NAME: MIT)
+
+### DevDependencies
+
+@eslint/eslintrc (LICENSE_NAME: MIT)
+@types/node (LICENSE_NAME: MIT)
+@types/react (LICENSE_NAME: MIT)
+@types/react-dom (LICENSE_NAME: MIT)
+cross-env (LICENSE_NAME: MIT)
+eslint (LICENSE_NAME: MIT)
+eslint-config-next (LICENSE_NAME: MIT)
+postcss (LICENSE_NAME: MIT)
+tailwindcss (LICENSE_NAME: MIT)
+ts-node (LICENSE_NAME: MIT)
+typescript (LICENSE_NAME: Apache-2.0)
+
